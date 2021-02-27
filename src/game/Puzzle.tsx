@@ -1,13 +1,7 @@
-import React, {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  StyleProp,
-  ViewStyle,
-  RegisteredStyle,
-} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, View, Image} from 'react-native';
 import {Panel} from '.';
+import {getCropImage} from './imageGenerator';
 
 const Cell = ({
   num,
@@ -20,19 +14,29 @@ const Cell = ({
   width: number;
   onTouchEnd: () => void;
 }) => {
+  const [image, setImage] = useState<string>('');
+  useEffect(() => {
+    (async () => {
+      try {
+        const image = await getCropImage(num);
+        setImage(image);
+      } catch (e) {
+        console.log('error', e);
+      }
+    })();
+  }, []);
+
   return (
     <View
       onTouchEnd={onTouchEnd}
       style={{
-        width: width - 2,
-        height: width - 2,
-        borderWidth: 1,
-        borderRadius: width / 10,
-        margin: 1,
-        backgroundColor: 'lightgreen',
+        width: width,
+        height: width,
         opacity: shown ? 0 : 1,
       }}>
-      <Text>{num}</Text>
+      {image ? (
+        <Image source={{uri: image}} style={{width: width, height: width}} />
+      ) : null}
     </View>
   );
 };

@@ -15,6 +15,7 @@ import {RoomId, MatchingData} from '../models/room';
 import {getFindOtherUser} from '../util/api';
 import {Flag} from 'react-native-svg-flagkit';
 import {getCropImage, clearCache} from '../game/imageGenerator';
+import {PuzzleSet} from '../game/PuzzleSet';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
 const Matching = () => {
@@ -35,7 +36,10 @@ const Matching = () => {
         }),
       ).catch((e) => console.log('error', e));
       setWaitTime(() => 4);
-      setMatchingData(matchingData);
+      setMatchingData({
+        user: matchingData.user,
+        puzzleSet: matchingData.puzzleSet,
+      });
     })();
   }, [getMe()]);
 
@@ -54,9 +58,9 @@ const Matching = () => {
   return (
     <SafeAreaView>
       <Finding
-        otherUser={matchingData?.otherUser}
+        otherUser={matchingData?.user}
         waitTime={waitTime}
-        onCancel={!matchingData?.otherUser ? () => navigation.pop() : undefined}
+        onCancel={!matchingData?.user ? () => navigation.pop() : undefined}
       />
     </SafeAreaView>
   );

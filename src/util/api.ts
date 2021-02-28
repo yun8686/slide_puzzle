@@ -1,14 +1,17 @@
-import {User} from '../models/user';
-import {RoomId, getRoomId} from '../models/room';
-import {getDeviceId, getUniqueId} from 'react-native-device-info';
+import {User, getMe} from '../models/user';
+import {getUniqueId} from 'react-native-device-info';
 import RNLocalize from 'react-native-localize';
+import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
+import {Panel} from '../game';
+
+const API_HOST = 'localhost:8080';
 
 export const getMeFetch = async (): Promise<User> => {
   const deviceId = getUniqueId();
   const region = RNLocalize.getCountry();
   return await (
     await fetch(
-      `http://localhost:8080/user?deviceId=${deviceId}&region=${region}`,
+      `http://${API_HOST}/user?deviceId=${deviceId}&region=${region}`,
       {method: 'GET'},
     )
   ).json();
@@ -17,7 +20,7 @@ export const getMeFetch = async (): Promise<User> => {
 export const updateMeFetch = async (user: Partial<User>): Promise<User> => {
   const deviceId = getUniqueId();
   const result = await (
-    await fetch(`http://localhost:8080/user`, {
+    await fetch(`http://${API_HOST}/user`, {
       method: 'POST',
       body: JSON.stringify({user, deviceId}),
       headers: {
@@ -31,16 +34,67 @@ export const updateMeFetch = async (user: Partial<User>): Promise<User> => {
 };
 
 type FindOtherUser = {
-  otherUser: User;
-  roomId: RoomId;
+  puzzleSet: ServerPuzzleSet;
+  user: User;
 };
 export const getFindOtherUser = async (): Promise<FindOtherUser> => {
-  return new Promise<FindOtherUser>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        otherUser: {deviceId: 'asd', name: 'Raichu', winrate: 10, region: 'US'},
-        roomId: getRoomId('roomID'),
-      });
-    }, 1000);
-  });
+  const me = getMe();
+  const result = (await (
+    await fetch(`http://${API_HOST}/gameResult?ignoreDeviceId=${me.deviceId}`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+  ).json()) as FindOtherUser;
+  if (result.user.deviceId === me.deviceId) {
+    return createCPUPuzzleSet('computer');
+  }
+  return result;
+};
+
+export const sendPuzzleSet = async (puzzleSet: PuzzleSet) => {
+  const me = getMe();
+  const result = await (
+    await fetch(`http://${API_HOST}/gameResult`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user: me,
+        puzzleSet: {
+          originPanel: puzzleSet.getOriginPanel(),
+          moveLogs: puzzleSet.getMoveLogs(),
+        },
+      }),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+  ).json();
+  console.log('send puzzleset result', result);
+  return result;
+};
+
+const createCPUPuzzleSet = (userName: string): FindOtherUser => {
+  const results = new PuzzleSet(4, 1000);
+  const makeObj: FindOtherUser = {
+    user: {
+      deviceId: 'cpu',
+      name: userName,
+      winrate: -10,
+      region: 'AD',
+    },
+    puzzleSet: {
+      originPanel: Array.from(results.getPanel()) as Panel,
+      moveLogs: results
+        .getRoutes()
+        .reverse()
+        .map((index, i) => ({
+          emptyIndex: index,
+          time: i * 1000,
+        })),
+    },
+  };
+  return makeObj;
 };

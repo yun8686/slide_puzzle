@@ -12,9 +12,10 @@ import {colors} from '../pallete';
 import {User} from '../models/user';
 import {RootStackParamList} from '../../App';
 import useInterval from 'use-interval';
-import {PanelSet} from './PanelSet';
+import {PuzzleSet} from './PuzzleSet';
 import {useNavigation} from '@react-navigation/native';
 import {Flag} from 'react-native-svg-flagkit';
+import {sendPuzzleSet} from '../util/api';
 
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 const PANE_SIZE = 4;
@@ -25,35 +26,29 @@ type Props = {
 };
 const Game = ({route}: Props) => {
   const navigation = useNavigation();
-  const {roomId, otherUser} = route.params;
-  const [basePanelSet, setBasePanelSet] = useState<PanelSet>();
-  const [panel, setPanel] = useState<PanelSet>();
-  const [otherPanel, setOtherPanel] = useState<PanelSet>();
+  const {user: otherUser, puzzleSet: basePuzzleSet} = route.params;
+  const [panel, setPanel] = useState<PuzzleSet>();
+  const [otherPanel, setOtherPanel] = useState<PuzzleSet>();
   const [waitTime, setWaitTime] = useState(5);
 
   useEffect(() => {
-    if (!basePanelSet) {
-      setBasePanelSet(() => new PanelSet(4, 10));
+    if (basePuzzleSet) {
+      setPanel(() => new PuzzleSet(basePuzzleSet, true));
     }
-  });
+  }, [basePuzzleSet]);
   useEffect(() => {
-    if (basePanelSet) {
-      setPanel(() => new PanelSet(basePanelSet));
+    if (basePuzzleSet) {
+      setOtherPanel(() => new PuzzleSet(basePuzzleSet, false));
     }
-  }, [basePanelSet]);
-  useEffect(() => {
-    if (basePanelSet) {
-      setOtherPanel(() => new PanelSet(basePanelSet));
-    }
-  }, [basePanelSet]);
+  }, [basePuzzleSet]);
   useInterval(() => {
     if (!otherPanel) return;
     if (waitTime >= 0) {
       setWaitTime(waitTime - 1);
     } else {
-      const nextIndex = otherPanel.popRoutes();
+      const nextIndex = otherPanel.popMoveLog()[0];
       if (nextIndex !== undefined && panel && !panel.isWin()) {
-        otherPanel.moveTo(nextIndex);
+        otherPanel.moveTo(nextIndex.emptyIndex, false);
         setOtherPanel(() => otherPanel.clone());
       }
     }
@@ -61,6 +56,15 @@ const Game = ({route}: Props) => {
 
   const isWon = !!panel && panel.isWin();
   const isLose = !!otherPanel && otherPanel.isWin();
+
+  useEffect(() => {
+    if (isWon && panel) {
+      sendPuzzleSet(panel).then(() => {
+        console.log('won!!!', panel);
+      });
+    }
+  }, [isWon]);
+
   if (!panel || !otherPanel) return <SafeAreaView></SafeAreaView>;
   return (
     <SafeAreaView>
@@ -79,13 +83,7 @@ const Game = ({route}: Props) => {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={styles.userInfoWrapper}>
-            <UserInfo
-              user={{
-                name: otherUser.name,
-                winrate: 10,
-                region: otherUser.region,
-              }}
-            />
+            <UserInfo user={otherUser} />
           </View>
           <Puzzle
             width={WINDOW_WIDTH / 3}
@@ -97,7 +95,7 @@ const Game = ({route}: Props) => {
           width={WINDOW_WIDTH}
           panel={panel.getPanel()}
           onTouchIndex={(nextIndex) => {
-            panel.moveTo(nextIndex);
+            panel.moveTo(nextIndex, true);
             setPanel(() => panel.clone());
           }}
           panelSize={PANE_SIZE}

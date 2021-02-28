@@ -14,6 +14,7 @@ const Title = () => {
   const [me, setMe] = useState<User>();
   useEffect(() => {
     getMeFetch().then((me) => {
+      updateMe(me);
       setMe(me);
     });
     return () => {};

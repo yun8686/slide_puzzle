@@ -1,10 +1,16 @@
 import {Panel} from '.';
 import PriorityQueue from 'fastpriorityqueue';
-type LogRow = {
+export type LogRow = {
   time: number;
   emptyIndex: number;
 };
-export class PanelSet {
+
+export type ServerPuzzleSet = {
+  originPanel: Panel;
+  moveLogs: LogRow[];
+};
+
+export class PuzzleSet {
   private panel: Panel;
   private originPanel: Panel;
   private routes: number[] = []; // suffle時にemptyIndexを記録する(逆順に辿るとゴールできる)
@@ -12,22 +18,46 @@ export class PanelSet {
   public getPanel = () => this.panel;
   public getRoutes = () => this.routes;
   public popRoutes = () => this.routes.pop();
+  public getOriginPanel = () => this.originPanel;
   public getMoveLogs = () => this.moveLogs;
-  constructor(panel: PanelSet, suffleTimes?: never);
+  public popMoveLog = () => this.moveLogs.splice(0, 1);
+
+  constructor(panel: Panel);
+
+  constructor(puzzleSet: PuzzleSet);
+  constructor(puzzleSet: ServerPuzzleSet, isPlayer: boolean);
+
   constructor(size: number, suffleTimes: number);
-  constructor(p: PanelSet | number, suffleTimes?: number) {
-    if (p instanceof PanelSet) {
+
+  constructor(
+    p: PuzzleSet | ServerPuzzleSet | number | Panel,
+    s?: number | boolean,
+  ) {
+    if (p instanceof PuzzleSet) {
       this.panel = Array.from(p.panel) as Panel;
       this.routes = Array.from(p.routes);
       this.originPanel = p.originPanel;
       this.moveLogs = p.moveLogs;
-    } else {
+    } else if (p instanceof Object && p.originPanel) {
+      const isPlayer = s;
+      this.panel = Array.from(p.originPanel) as Panel;
+      this.originPanel = Array.from(this.panel) as Panel;
+      if (!isPlayer) this.moveLogs = p.moveLogs;
+    } else if (p instanceof Array) {
+      this.panel = Array.from(p) as Panel;
+      this.originPanel = Array.from(this.panel) as Panel;
+      this.moveLogs = [];
+    } else if (typeof p === 'number' && typeof s === 'number') {
+      const suffleTimes = s;
       this.panel = new Array(p * p).fill(0).map((_v, i) => i + 1) as Panel;
       if (suffleTimes) {
         this.suffle(suffleTimes);
       }
       this.originPanel = Array.from(this.panel) as Panel;
       this.moveLogs = [];
+    } else {
+      console.log('error', 'nonConstructor', {p, s});
+      throw 'non constructor';
     }
   }
 
@@ -42,7 +72,7 @@ export class PanelSet {
       const movableIndexes = this.getMovableIndexes();
       const nextIndex =
         movableIndexes[Math.floor(Math.random() * movableIndexes.length)];
-      this.moveTo(nextIndex);
+      this.moveTo(nextIndex, true);
     }
   }
 
@@ -61,7 +91,7 @@ export class PanelSet {
     }
     return ans;
   }
-  moveTo(moveToIndex: number) {
+  moveTo(moveToIndex: number, recordLog: boolean) {
     const emptyNumber = this.panel.length;
     const panelSize = Math.sqrt(emptyNumber);
     const emptyIndex = this.panel.findIndex((v) => v === emptyNumber);
@@ -70,7 +100,7 @@ export class PanelSet {
     const canMoveX =
       Math.floor(emptyIndex / panelSize) ===
       Math.floor(moveToIndex / panelSize);
-    if (canMoveX || canMoveY)
+    if (recordLog && (canMoveX || canMoveY))
       this.moveLogs.push({time: new Date().getTime(), emptyIndex: moveToIndex});
     if (canMoveY) {
       if (moveToIndex > emptyIndex) {
@@ -107,10 +137,11 @@ export class PanelSet {
     }
   }
 
-  clone(): PanelSet {
-    return new PanelSet(this);
+  clone(): PuzzleSet {
+    return new PuzzleSet(this);
   }
   isWin(): boolean {
+    if (!this.panel) return false;
     return this.panel.every((v, i) => v === i + 1);
   }
 }

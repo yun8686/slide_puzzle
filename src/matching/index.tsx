@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import {RoomId, MatchingData} from '../models/room';
 import {getFindOtherUser} from '../util/api';
 import {Flag} from 'react-native-svg-flagkit';
+import {getCropImage, clearCache} from '../game/imageGenerator';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
 const Matching = () => {
@@ -26,10 +27,18 @@ const Matching = () => {
   useEffect(() => {
     (async () => {
       const matchingData = await getFindOtherUser();
-      setMatchingData(matchingData);
+      console.log('matchingData', matchingData);
+      clearCache();
+      await Promise.all(
+        new Array(16).map((_key, i) => {
+          return getCropImage(i + 1);
+        }),
+      ).catch((e) => console.log('error', e));
       setWaitTime(() => 4);
+      setMatchingData(matchingData);
     })();
   }, [getMe()]);
+
   useEffect(() => {
     if (waitTime === 0 && matchingData) {
       navigation.replace('Game', matchingData);

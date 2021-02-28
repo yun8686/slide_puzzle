@@ -5,7 +5,6 @@ import {
   View,
   Text,
   Dimensions,
-  Button,
   TouchableOpacity,
 } from 'react-native';
 import Puzzle from './Puzzle';

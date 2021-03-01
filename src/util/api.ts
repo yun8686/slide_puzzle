@@ -48,10 +48,16 @@ export const getFindOtherUser = async (): Promise<FindOtherUser> => {
       },
     })
   ).json()) as FindOtherUser;
-  if (result.user.deviceId === me.deviceId) {
-    return createCPUPuzzleSet('computer');
-  }
-  return result;
+  // if (result.user.deviceId === me.deviceId) {
+  //   return createCPUPuzzleSet('computer');
+  // }
+  return {
+    ...result,
+    puzzleSet: {
+      ...result.puzzleSet,
+      type: 'ServerPuzzleSet',
+    },
+  };
 };
 
 export const sendPuzzleSet = async (puzzleSet: PuzzleSet) => {
@@ -86,6 +92,7 @@ const createCPUPuzzleSet = (userName: string): FindOtherUser => {
       region: 'AD',
     },
     puzzleSet: {
+      type: 'ServerPuzzleSet',
       originPanel: Array.from(results.getPanel()) as Panel,
       moveLogs: results
         .getRoutes()

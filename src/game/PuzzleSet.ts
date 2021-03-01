@@ -6,6 +6,7 @@ export type LogRow = {
 };
 
 export type ServerPuzzleSet = {
+  type: 'ServerPuzzleSet';
   originPanel: Panel;
   moveLogs: LogRow[];
 };
@@ -20,7 +21,22 @@ export class PuzzleSet {
   public popRoutes = () => this.routes.pop();
   public getOriginPanel = () => this.originPanel;
   public getMoveLogs = () => this.moveLogs;
-  public popMoveLog = () => this.moveLogs.splice(0, 1);
+
+  private currentLogIndex = 0;
+  public popMoveLog = () => {
+    console.log('this.currentLogIndex', this.currentLogIndex);
+    const currentLogIndex = this.currentLogIndex;
+    ++this.currentLogIndex;
+    return {
+      logRow: this.moveLogs[currentLogIndex],
+      waitTime:
+        currentLogIndex > 0
+          ? this.moveLogs[currentLogIndex].time -
+            this.moveLogs[currentLogIndex - 1].time
+          : 0,
+    };
+  };
+  public getCurrentLogIndex = () => this.currentLogIndex;
 
   constructor(panel: Panel);
 
@@ -38,7 +54,8 @@ export class PuzzleSet {
       this.routes = Array.from(p.routes);
       this.originPanel = p.originPanel;
       this.moveLogs = p.moveLogs;
-    } else if (p instanceof Object && p.originPanel) {
+      this.currentLogIndex = p.currentLogIndex;
+    } else if (p instanceof Object && p.type === 'ServerPuzzleSet') {
       const isPlayer = s;
       this.panel = Array.from(p.originPanel) as Panel;
       this.originPanel = Array.from(this.panel) as Panel;

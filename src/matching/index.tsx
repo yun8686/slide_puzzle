@@ -28,13 +28,12 @@ const Matching = () => {
   useEffect(() => {
     (async () => {
       const matchingData = await getFindOtherUser();
-      console.log('matchingData', matchingData);
       clearCache();
       await Promise.all(
         new Array(16).map((_key, i) => {
           return getCropImage(i + 1);
         }),
-      ).catch((e) => console.log('error', e));
+      );
       setWaitTime(() => 4);
       setMatchingData({
         user: matchingData.user,

@@ -11,7 +11,6 @@ import Puzzle from './Puzzle';
 import {colors} from '../pallete';
 import {User} from '../models/user';
 import {RootStackParamList} from '../../App';
-import useInterval from 'use-interval';
 import {PuzzleSet} from './PuzzleSet';
 import {useNavigation} from '@react-navigation/native';
 import {Flag} from 'react-native-svg-flagkit';
@@ -41,27 +40,37 @@ const Game = ({route}: Props) => {
       setOtherPanel(() => new PuzzleSet(basePuzzleSet, false));
     }
   }, [basePuzzleSet]);
-  useInterval(() => {
+  useEffect(() => {
     if (!otherPanel) return;
     if (waitTime >= 0) {
-      setWaitTime(waitTime - 1);
+      const timeout = setTimeout(() => {
+        setWaitTime(waitTime - 1);
+      }, 1000);
+      return () => {
+        clearTimeout(timeout);
+      };
     } else {
-      const nextIndex = otherPanel.popMoveLog()[0];
-      if (nextIndex !== undefined && panel && !panel.isWin()) {
-        otherPanel.moveTo(nextIndex.emptyIndex, false);
-        setOtherPanel(() => otherPanel.clone());
+      if (waitTime <= 0 && !panel?.isWin() && !otherPanel?.isWin()) {
+        const {logRow: nextLogRow, waitTime} = otherPanel.popMoveLog();
+        if (nextLogRow !== undefined) {
+          const timeout = setTimeout(() => {
+            otherPanel.moveTo(nextLogRow.emptyIndex, false);
+            setOtherPanel(() => otherPanel.clone());
+          }, waitTime);
+          return () => {
+            clearTimeout(timeout);
+          };
+        }
       }
     }
-  }, 1000);
+  }, [otherPanel, waitTime]);
 
   const isWon = !!panel && panel.isWin();
   const isLose = !!otherPanel && otherPanel.isWin();
 
   useEffect(() => {
     if (isWon && panel) {
-      sendPuzzleSet(panel).then(() => {
-        console.log('won!!!', panel);
-      });
+      sendPuzzleSet(panel);
     }
   }, [isWon]);
 

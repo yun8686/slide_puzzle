@@ -20,7 +20,7 @@ router.get<unknown, unknown, unknown, GetUserQuery>(
     } else {
       const user = await userCollection.insertOne({
         deviceId,
-        name: 'Peko',
+        name: 'no name',
         winrate: 0,
       });
       res.json(user.ops[0]);

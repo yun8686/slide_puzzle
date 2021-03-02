@@ -24,7 +24,6 @@ export class PuzzleSet {
 
   private currentLogIndex = 0;
   public popMoveLog = () => {
-    console.log('this.currentLogIndex', this.currentLogIndex);
     const currentLogIndex = this.currentLogIndex;
     ++this.currentLogIndex;
     return {

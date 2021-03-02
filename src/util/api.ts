@@ -29,7 +29,6 @@ export const updateMeFetch = async (user: Partial<User>): Promise<User> => {
       },
     })
   ).json();
-  console.log('result', result);
   return result;
 };
 
@@ -78,7 +77,6 @@ export const sendPuzzleSet = async (puzzleSet: PuzzleSet) => {
       },
     })
   ).json();
-  console.log('send puzzleset result', result);
   return result;
 };
 

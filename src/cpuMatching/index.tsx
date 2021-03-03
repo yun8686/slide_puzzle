@@ -18,7 +18,7 @@ import {getCropImage, clearCache} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
-const Matching = () => {
+const CpuMatching = () => {
   const [matchingData, setMatchingData] = useState<MatchingData | undefined>(
     undefined,
   );
@@ -27,7 +27,7 @@ const Matching = () => {
   const navigation = useNavigation();
   useEffect(() => {
     (async () => {
-      const matchingData = await getFindOtherUser();
+      const matchingData = await getFindOtherUser(true);
       clearCache();
       await Promise.all(
         new Array(16).map((_key, i) => {
@@ -44,7 +44,7 @@ const Matching = () => {
 
   useEffect(() => {
     if (waitTime === 0 && matchingData) {
-      navigation.replace('Game', {matchingData, mode: 'PLAYER'});
+      navigation.replace('Game', {matchingData, mode: 'CPU'});
     } else {
       const timeout = setTimeout(() => {
         setWaitTime(waitTime - 1);
@@ -161,4 +161,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Matching;
+export default CpuMatching;

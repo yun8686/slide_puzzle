@@ -46,7 +46,11 @@ const Title = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              navigation.push('CpuMatching');
+            }}>
             <Text style={styles.text}>SINGLE PLAY</Text>
           </TouchableOpacity>
           <TouchableOpacity

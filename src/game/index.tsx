@@ -25,7 +25,10 @@ type Props = {
 };
 const Game = ({route}: Props) => {
   const navigation = useNavigation();
-  const {user: otherUser, puzzleSet: basePuzzleSet} = route.params;
+  const {
+    mode: gameMode,
+    matchingData: {user: otherUser, puzzleSet: basePuzzleSet},
+  } = route.params;
   const [panel, setPanel] = useState<PuzzleSet>();
   const [otherPanel, setOtherPanel] = useState<PuzzleSet>();
   const [waitTime, setWaitTime] = useState(5);
@@ -82,7 +85,11 @@ const Game = ({route}: Props) => {
         <ResultModal
           isWin={isWon}
           onClickNextGame={() => {
-            navigation.replace('Matching');
+            if (gameMode === 'CPU') {
+              navigation.replace('CpuMatching');
+            } else if (gameMode === 'PLAYER') {
+              navigation.replace('Matching');
+            }
           }}
           onClickBackToTitle={() => {
             navigation.replace('Title');

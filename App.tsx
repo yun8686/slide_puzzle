@@ -18,11 +18,13 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Matching from './src/matching';
 import {RoomId, MatchingData} from './src/models/room';
 import {User} from './src/models/user';
+import CpuMatching from './src/cpuMatching';
 
 export type RootStackParamList = {
   Title: undefined;
+  CpuMatching: undefined;
   Matching: undefined;
-  Game: MatchingData;
+  Game: {matchingData: MatchingData; mode: 'CPU' | 'PLAYER'};
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -34,6 +36,14 @@ const App: () => React.ReactNode = () => {
         <Stack.Screen
           name="Title"
           component={Title}
+          options={{
+            headerShown: false,
+            headerBackTitleVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="CpuMatching"
+          component={CpuMatching}
           options={{
             headerShown: false,
             headerBackTitleVisible: false,

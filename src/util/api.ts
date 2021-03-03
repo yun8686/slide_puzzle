@@ -36,8 +36,13 @@ type FindOtherUser = {
   puzzleSet: ServerPuzzleSet;
   user: User;
 };
-export const getFindOtherUser = async (): Promise<FindOtherUser> => {
+export const getFindOtherUser = async (
+  isCpu?: boolean,
+): Promise<FindOtherUser> => {
   const me = getMe();
+  if (isCpu) {
+    return createCPUPuzzleSet('computer');
+  }
   const result = (await (
     await fetch(`http://${API_HOST}/gameResult?ignoreDeviceId=${me.deviceId}`, {
       method: 'GET',
@@ -47,9 +52,6 @@ export const getFindOtherUser = async (): Promise<FindOtherUser> => {
       },
     })
   ).json()) as FindOtherUser;
-  // if (result.user.deviceId === me.deviceId) {
-  //   return createCPUPuzzleSet('computer');
-  // }
   return {
     ...result,
     puzzleSet: {
@@ -80,14 +82,14 @@ export const sendPuzzleSet = async (puzzleSet: PuzzleSet) => {
   return result;
 };
 
-const createCPUPuzzleSet = (userName: string): FindOtherUser => {
+const createCPUPuzzleSet = (cpuName: string): FindOtherUser => {
   const results = new PuzzleSet(4, 1000);
   const makeObj: FindOtherUser = {
     user: {
       deviceId: 'cpu',
-      name: userName,
+      name: cpuName,
       winrate: -10,
-      region: 'AD',
+      region: getMe().region,
     },
     puzzleSet: {
       type: 'ServerPuzzleSet',

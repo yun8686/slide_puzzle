@@ -2,9 +2,18 @@ import {User, getMe} from '../models/user';
 import {getUniqueId} from 'react-native-device-info';
 import RNLocalize from 'react-native-localize';
 import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
-import {Panel} from '../game';
+import {Panel, GameMode} from '../game';
 
-const API_HOST = 'localhost:8080';
+const API_HOST = '153.126.161.193:8080';
+
+export const getRanking = async (): Promise<User[]> => {
+  const deviceId = getUniqueId();
+  return await (
+    await fetch(`http://${API_HOST}/ranking?deviceId=${deviceId}`, {
+      method: 'GET',
+    })
+  ).json();
+};
 
 export const getMeFetch = async (): Promise<User> => {
   const deviceId = getUniqueId();
@@ -61,13 +70,17 @@ export const getFindOtherUser = async (
   };
 };
 
-export const sendPuzzleSet = async (puzzleSet: PuzzleSet) => {
+export const sendPuzzleSet = async (
+  gameMode: GameMode,
+  puzzleSet: PuzzleSet,
+) => {
   const me = getMe();
   const result = await (
     await fetch(`http://${API_HOST}/gameResult`, {
       method: 'POST',
       body: JSON.stringify({
         user: me,
+        gameMode,
         puzzleSet: {
           originPanel: puzzleSet.getOriginPanel(),
           moveLogs: puzzleSet.getMoveLogs(),

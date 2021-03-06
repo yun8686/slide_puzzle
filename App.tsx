@@ -6,12 +6,12 @@
  * @flow strict-local
  */
 
-import 'react-native-gesture-handler';
+// import 'react-native-gesture-handler';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import Game from './src/game';
+import Game, {GameMode} from './src/game';
 import Title from './src/title';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -24,7 +24,7 @@ export type RootStackParamList = {
   Title: undefined;
   CpuMatching: undefined;
   Matching: undefined;
-  Game: {matchingData: MatchingData; mode: 'CPU' | 'PLAYER'};
+  Game: {matchingData: MatchingData; mode: GameMode};
 };
 
 const Stack = createStackNavigator<RootStackParamList>();

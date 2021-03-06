@@ -2,8 +2,11 @@ export const sendWinPuzzleSet = () => {};
 
 import {Router} from 'express';
 import {mongo} from '../mongo';
-import {User} from '../models/user';
-import {ServerPuzzleSet, getCollection, GameResults} from '../models/game';
+import {getCollection, GameResults} from '../models/game';
+import {getCollection as getUserCollection} from '../models/user';
+import {GameMode} from '../../../src/game';
+import {User} from '../../../src/models/user';
+import {ServerPuzzleSet} from '../../../src/game/PuzzleSet';
 const router = Router();
 
 router.get<unknown, GameResults, null, {ignoreDeviceId: string}>(
@@ -23,17 +26,25 @@ router.get<unknown, GameResults, null, {ignoreDeviceId: string}>(
   },
 );
 
-router.post<unknown, unknown, {user: User; puzzleSet: ServerPuzzleSet}>(
-  '/gameResult',
-  async (req, res) => {
-    const {user, puzzleSet} = req.body;
-    const db = await mongo();
-    const gameCollection = getCollection(db);
-    const result = await gameCollection.insertOne({
-      puzzleSet: puzzleSet,
-      user: user,
-    });
-    res.send(result.ops[0]);
-  },
-);
+router.post<
+  unknown,
+  unknown,
+  {gameMode: GameMode; user: User; puzzleSet: ServerPuzzleSet}
+>('/gameResult', async (req, res) => {
+  const {user, puzzleSet, gameMode} = req.body;
+  const db = await mongo();
+  const gameCollection = getCollection(db);
+  const result = await gameCollection.insertOne({
+    puzzleSet: puzzleSet,
+    user: user,
+  });
+  if (gameMode === 'PLAYER') {
+    const userCollection = await getUserCollection(db);
+    await userCollection.updateOne(
+      {deviceId: user.deviceId},
+      {$inc: {winrate: 1}},
+    );
+  }
+  res.send(result.ops[0]);
+});
 export default router;

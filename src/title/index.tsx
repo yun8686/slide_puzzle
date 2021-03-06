@@ -1,16 +1,28 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, SafeAreaView, TextInput} from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
 import {colors} from '../pallete';
 import {useNavigation} from '@react-navigation/native';
 import {getMe, updateMe, User} from '../models/user';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {getMeFetch, updateMeFetch} from '../util/api';
+import {ScrollView, GestureHandlerRootView} from 'react-native-gesture-handler';
+import {getMeFetch, updateMeFetch, getRanking} from '../util/api';
+import {Flag} from 'react-native-svg-flagkit';
+
 const Title = () => {
   const navigation = useNavigation();
   const [isEditNameModal, setIsEditNameModal] = useState<boolean>(false);
+  const [isRankingModal, setIsRankingModal] = useState<boolean>(false);
+
   const [me, setMe] = useState<User>();
   useEffect(() => {
     getMeFetch().then((me) => {
@@ -71,14 +83,16 @@ const Title = () => {
             />
           </TouchableOpacity>
           <View style={{width: 20}}></View>
-          <Icon
-            style={{alignSelf: 'center'}}
-            name="trophy"
-            color={colors.buttonColor}
-            size={50}
-          />
+          <TouchableOpacity onPress={() => setIsRankingModal(true)}>
+            <Icon
+              style={{alignSelf: 'center'}}
+              name="trophy"
+              color={colors.buttonColor}
+              size={50}
+            />
+          </TouchableOpacity>
         </View>
-        {isEditNameModal ? (
+        {isEditNameModal || !me.name ? (
           <NameEditModal
             name={me.name}
             onDismiss={() => {
@@ -90,11 +104,165 @@ const Title = () => {
             }}
           />
         ) : null}
+        {isRankingModal ? (
+          <RankingModal onDismiss={() => setIsRankingModal(false)} />
+        ) : null}
       </View>
     </SafeAreaView>
   );
 };
-
+const RankingModal = ({onDismiss}: {onDismiss: () => void}) => {
+  const [rankingList, setRankingList] = useState<User[]>([]);
+  const [shown, setShown] = useState<boolean>(false);
+  useEffect(() => {
+    if (shown)
+      getRanking().then((rankings) => {
+        setRankingList(rankings);
+      });
+  }, [shown]);
+  return (
+    <Modal
+      onModalShow={() => {
+        setShown(true);
+      }}
+      isVisible={true}
+      onDismiss={onDismiss}
+      style={{alignContent: 'center', alignItems: 'center'}}>
+      <View
+        style={{
+          backgroundColor: '#FFF',
+          alignContent: 'center',
+          maxHeight: '80%',
+          width: 360,
+          maxWidth: '100%',
+          padding: 20,
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            fontSize: 32,
+            paddingBottom: 20,
+          }}>
+          RANKING
+        </Text>
+        <View
+          style={{
+            paddingTop: 8,
+            flexDirection: 'row',
+            backgroundColor: colors.backgroundColor,
+            width: 300,
+            borderBottomWidth: 1,
+          }}>
+          <Text
+            style={{
+              flexBasis: 60,
+              fontSize: 16,
+              textAlign: 'center',
+              alignSelf: 'flex-end',
+            }}>
+            Rank
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              flexGrow: 1,
+              paddingLeft: 32,
+              alignSelf: 'flex-end',
+            }}>
+            Name
+          </Text>
+          <Text
+            style={{
+              flexBasis: 60,
+              fontSize: 16,
+              textAlign: 'center',
+              alignSelf: 'flex-end',
+            }}>
+            Won
+          </Text>
+        </View>
+        <GestureHandlerRootView
+          style={{
+            flexShrink: 1,
+            flexGrow: 1,
+            width: 300,
+            backgroundColor: colors.backgroundColor,
+          }}>
+          <ScrollView style={{backgroundColor: colors.backgroundColor}}>
+            {rankingList.length > 0 ? (
+              rankingList.map((user, i) => {
+                return (
+                  <View
+                    key={i}
+                    style={{
+                      flexDirection: 'row',
+                      paddingVertical: 4,
+                    }}>
+                    <Text
+                      style={{
+                        flexBasis: 60,
+                        fontSize: 16,
+                        textAlign: 'center',
+                        alignSelf: 'center',
+                      }}>
+                      {i + 1}
+                    </Text>
+                    <View style={{alignSelf: 'center', width: 16}}>
+                      <Flag id={user.region || ''} width={16} height={16} />
+                    </View>
+                    <View
+                      style={{
+                        flexGrow: 1,
+                        flexShrink: 1,
+                        flexDirection: 'row',
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          paddingLeft: 16,
+                        }}>
+                        {user.name}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        flexBasis: 60,
+                        fontSize: 16,
+                        textAlign: 'center',
+                        alignSelf: 'center',
+                      }}>
+                      {user.winrate}
+                    </Text>
+                  </View>
+                );
+              })
+            ) : (
+              <View
+                style={{
+                  width: 300,
+                  paddingTop: 20,
+                }}>
+                <ActivityIndicator size="small" color={colors.buttonColor} />
+              </View>
+            )}
+          </ScrollView>
+        </GestureHandlerRootView>
+        <View style={{marginTop: 20}} />
+        <TouchableOpacity
+          style={{
+            alignSelf: 'center',
+          }}
+          onPress={() => {
+            onDismiss();
+          }}>
+          <View style={styles.modalButton}>
+            <Text style={{color: 'white'}}>Close</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </Modal>
+  );
+};
 const NameEditModal = ({
   name,
   onDismiss,

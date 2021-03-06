@@ -18,7 +18,7 @@ import {sendPuzzleSet} from '../util/api';
 
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 const PANE_SIZE = 4;
-
+export type GameMode = 'CPU' | 'PLAYER';
 export type Panel = number[] & {__panel: never};
 type Props = {
   route: {params: RootStackParamList['Game']};
@@ -73,7 +73,7 @@ const Game = ({route}: Props) => {
 
   useEffect(() => {
     if (isWon && panel) {
-      sendPuzzleSet(panel);
+      sendPuzzleSet(gameMode, panel);
     }
   }, [isWon]);
 

@@ -4,7 +4,7 @@ import RNLocalize from 'react-native-localize';
 import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
 import {Panel, GameMode} from '../game';
 
-const API_HOST = '153.126.161.193:8080';
+const API_HOST = 'localhost:8080';
 
 export const getRanking = async (): Promise<User[]> => {
   const deviceId = getUniqueId();

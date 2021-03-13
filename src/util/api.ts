@@ -4,7 +4,11 @@ import RNLocalize from 'react-native-localize';
 import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
 import {Panel, GameMode} from '../game';
 
-const API_HOST = 'localhost:8080';
+// const API_HOST = 'localhost:8080';
+const API_HOST = '153.126.161.193:8080';
+
+const sleep = async (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export const getRanking = async (): Promise<User[]> => {
   const deviceId = getUniqueId();
@@ -45,6 +49,7 @@ type FindOtherUser = {
   puzzleSet: ServerPuzzleSet;
   user: User;
 };
+
 export const getFindOtherUser = async (
   isCpu?: boolean,
 ): Promise<FindOtherUser> => {
@@ -61,6 +66,7 @@ export const getFindOtherUser = async (
       },
     })
   ).json()) as FindOtherUser;
+  await sleep(2000);
   return {
     ...result,
     puzzleSet: {

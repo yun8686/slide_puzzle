@@ -16,6 +16,7 @@ import {getFindOtherUser} from '../util/api';
 import {Flag} from 'react-native-svg-flagkit';
 import {getCropImage, clearCache} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
+import {BallIndicator} from 'react-native-indicators';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
 const Matching = () => {
@@ -85,7 +86,11 @@ const Finding = ({otherUser, onCancel, waitTime}: FindingProps) => {
         {otherUser ? (
           <Text style={{fontSize: 20, textAlign: 'center'}}>VS</Text>
         ) : null}
-        {otherUser ? <UserInfo user={otherUser} /> : null}
+        {otherUser ? (
+          <UserInfo user={otherUser} />
+        ) : (
+          <BallIndicator size={60} />
+        )}
       </View>
       {onCancel ? (
         <TouchableOpacity onPress={onCancel} style={styles.button}>

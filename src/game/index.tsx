@@ -37,11 +37,13 @@ const Game = ({route}: Props) => {
     if (basePuzzleSet) {
       setPanel(() => new PuzzleSet(basePuzzleSet, true));
     }
+    return () => {};
   }, [basePuzzleSet]);
   useEffect(() => {
     if (basePuzzleSet) {
       setOtherPanel(() => new PuzzleSet(basePuzzleSet, false));
     }
+    return () => {};
   }, [basePuzzleSet]);
   useEffect(() => {
     if (!otherPanel) return;
@@ -66,6 +68,7 @@ const Game = ({route}: Props) => {
         }
       }
     }
+    return () => {};
   }, [otherPanel, waitTime]);
 
   const isWon = !!panel && panel.isWin();
@@ -75,6 +78,7 @@ const Game = ({route}: Props) => {
     if (isWon && panel) {
       sendPuzzleSet(gameMode, panel);
     }
+    return () => {};
   }, [isWon]);
 
   if (!panel || !otherPanel) return <SafeAreaView></SafeAreaView>;

@@ -100,6 +100,7 @@ const Title = () => {
             }}
             onSubmit={async (updatedMe) => {
               setMe(updatedMe);
+              updateMe(updatedMe);
               setIsEditNameModal(false);
             }}
           />

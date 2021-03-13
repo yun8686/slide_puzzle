@@ -46,12 +46,18 @@ const Title = () => {
         style={{
           alignItems: 'center',
         }}>
-        <Text style={{color: '#8f3b76', fontSize: 30, marginBottom: 50}}>
+        <Text
+          style={{
+            color: '#8f3b76',
+            fontSize: 30,
+            fontWeight: 'bold',
+            marginBottom: 50,
+          }}>
           SLIDING PUZZLE BATTLE
         </Text>
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: 'column',
             maxWidth: '100%',
             minWidth: '100%',
             padding: 30,
@@ -78,7 +84,7 @@ const Title = () => {
             <Icon
               style={{alignSelf: 'center'}}
               name="cog"
-              color={colors.buttonColor}
+              color={colors.iconColor}
               size={50}
             />
           </TouchableOpacity>
@@ -87,7 +93,7 @@ const Title = () => {
             <Icon
               style={{alignSelf: 'center'}}
               name="trophy"
-              color={colors.buttonColor}
+              color={colors.iconColor}
               size={50}
             />
           </TouchableOpacity>
@@ -306,7 +312,7 @@ const NameEditModal = ({
         <View style={{marginTop: 20}} />
         <TouchableOpacity
           style={{
-            alignSelf: 'center',
+            marginBottom: 20,
           }}
           disabled={!shouldSubmit}
           onPress={async () => {
@@ -317,6 +323,14 @@ const NameEditModal = ({
           <View style={styles.modalButton}>
             <Text style={{color: 'white'}}>Submit</Text>
           </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            alignSelf: 'center',
+            flexShrink: 1,
+          }}
+          onPress={onDismiss}>
+          <Text style={{color: '#707070'}}>Cancel</Text>
         </TouchableOpacity>
       </View>
     </Modal>
@@ -337,7 +351,9 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     height: 80,
     padding: 10,
+    paddingHorizontal: 80,
     borderRadius: 10,
+    marginBottom: 20,
     backgroundColor: colors.buttonColor,
     alignItems: 'center',
     justifyContent: 'center',
@@ -348,6 +364,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     backgroundColor: colors.buttonColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+  },
+  cancelModalButton: {
     alignItems: 'center',
     justifyContent: 'center',
     height: 40,

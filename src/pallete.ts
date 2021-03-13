@@ -3,4 +3,5 @@ export const colors = {
   buttonColor: '#1f306e',
   buttonDisabledColor: '#c0c0c0',
   buttonTextColor: '#ffffff',
+  iconColor: '#707070',
 };

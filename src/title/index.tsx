@@ -84,7 +84,7 @@ const Title = () => {
             <Icon
               style={{alignSelf: 'center'}}
               name="cog"
-              color={colors.iconColor}
+              color={colors.settingColor}
               size={50}
             />
           </TouchableOpacity>
@@ -93,7 +93,7 @@ const Title = () => {
             <Icon
               style={{alignSelf: 'center'}}
               name="trophy"
-              color={colors.iconColor}
+              color={colors.rankingColor}
               size={50}
             />
           </TouchableOpacity>
@@ -262,9 +262,7 @@ const RankingModal = ({onDismiss}: {onDismiss: () => void}) => {
           onPress={() => {
             onDismiss();
           }}>
-          <View style={styles.modalButton}>
-            <Text style={{color: 'white'}}>Close</Text>
-          </View>
+          <Text style={{color: colors.closeTextColor}}>Close</Text>
         </TouchableOpacity>
       </View>
     </Modal>
@@ -330,7 +328,7 @@ const NameEditModal = ({
             flexShrink: 1,
           }}
           onPress={onDismiss}>
-          <Text style={{color: '#707070'}}>Cancel</Text>
+          <Text style={{color: colors.closeTextColor}}>Close</Text>
         </TouchableOpacity>
       </View>
     </Modal>

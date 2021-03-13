@@ -17,6 +17,7 @@ import {Flag} from 'react-native-svg-flagkit';
 import {getCropImage, clearCache} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
 import {BallIndicator} from 'react-native-indicators';
+import {Card} from 'react-native-elements';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
 const Matching = () => {
@@ -113,21 +114,23 @@ const Finding = ({otherUser, onCancel, waitTime}: FindingProps) => {
 
 const UserInfo = ({user}: {user: User}) => {
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        width: WINDOW_WIDTH * 0.8,
-      }}>
-      <Flag id={user.region} width={60} height={60} />
+    <Card>
       <View
         style={{
-          justifyContent: 'space-evenly',
-          paddingLeft: 20,
+          flexDirection: 'row',
+          width: WINDOW_WIDTH * 0.8,
         }}>
-        <Text style={{fontSize: 20}}>{user.name}</Text>
-        <Text style={{fontSize: 20}}>WinRate {user.winrate}</Text>
+        <Flag id={user.region} width={60} height={60} />
+        <View
+          style={{
+            justifyContent: 'space-evenly',
+            paddingLeft: 20,
+          }}>
+          <Text style={{fontSize: 20}}>{user.name}</Text>
+          <Text style={{fontSize: 20}}>WinRate {user.winrate}</Text>
+        </View>
       </View>
-    </View>
+    </Card>
   );
 };
 

@@ -200,7 +200,7 @@ const CenterModal = ({
           alignItems: 'center',
           height: 200,
           width: '100%',
-          backgroundColor: colors.backgroundColor,
+          backgroundColor: colors.timerBackgroundColor,
           opacity: 0.8,
         }}>
         <Text style={{color: 'black', fontSize: 40}}>{text}</Text>

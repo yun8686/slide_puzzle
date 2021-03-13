@@ -1,7 +1,10 @@
 export const colors = {
-  backgroundColor: '#fff5eb',
+  backgroundColor: '#EBDECA',
+  timerBackgroundColor: '#EFEFEF',
   buttonColor: '#1f306e',
   buttonDisabledColor: '#c0c0c0',
   buttonTextColor: '#ffffff',
-  iconColor: '#707070',
+  settingColor: '#707070',
+  rankingColor: '#FCD330',
+  closeTextColor: '#707070',
 };

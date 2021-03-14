@@ -257,7 +257,8 @@ const RankingModal = ({onDismiss}: {onDismiss: () => void}) => {
               <View
                 style={{
                   width: 300,
-                  paddingTop: 20,
+                  minHeight: 40,
+                  justifyContent: 'center',
                 }}>
                 <ActivityIndicator size="small" color={colors.buttonColor} />
               </View>

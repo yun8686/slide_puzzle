@@ -160,4 +160,13 @@ export class PuzzleSet {
     if (!this.panel) return false;
     return this.panel.every((v, i) => v === i + 1);
   }
+
+  getResolveTime(): number {
+    if (this.isWin()) {
+      const lastIndex = this.moveLogs.length - 1;
+      const time = this.moveLogs[lastIndex].time - this.moveLogs[0].time;
+      return time;
+    }
+    return -1;
+  }
 }

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, ReactElement} from 'react';
+import React, {useState, useEffect, ReactElement, ReactNode} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -88,6 +88,7 @@ const Game = ({route}: Props) => {
       {isWon || isLose ? (
         <ResultModal
           isWin={isWon}
+          panel={panel}
           onClickNextGame={() => {
             if (gameMode === 'CPU') {
               navigation.replace('CpuMatching');
@@ -144,19 +145,25 @@ const UserInfo = ({user}: {user: User}) => {
 };
 
 const WaitingModal = ({waitTime}: {waitTime: number}) => {
-  return <CenterModal text={waitTime.toString()} />;
+  return <CenterModal text={waitTime > 0 ? waitTime.toString() : 'start'} />;
 };
 const ResultModal = ({
   isWin,
+  panel,
   onClickNextGame,
   onClickBackToTitle,
 }: {
   isWin: boolean;
+  panel: PuzzleSet;
   onClickNextGame: () => void;
   onClickBackToTitle: () => void;
 }) => {
+  const resolveTime = panel.getResolveTime() / 1000;
   return (
     <CenterModal text={isWin ? 'You win!' : 'You lose...'}>
+      {isWin ? (
+        <Text style={{fontSize: 24}}>time: {resolveTime} sec</Text>
+      ) : null}
       <View
         style={{
           flexDirection: 'row',
@@ -182,7 +189,7 @@ const CenterModal = ({
   children,
 }: {
   text: string;
-  children?: ReactElement;
+  children?: ReactNode;
 }) => {
   return (
     <View

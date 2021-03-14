@@ -31,7 +31,7 @@ const CpuMatching = () => {
       const matchingData = await getFindOtherUser(true);
       clearCache();
       await Promise.all(
-        new Array(16).map((_key, i) => {
+        new Array(16).fill('').map((_key, i) => {
           return getCropImage(i + 1);
         }),
       );

@@ -2,6 +2,7 @@ import express from 'express';
 import * as http from 'http';
 import user from './src/api/user';
 import game from './src/api/game';
+import image from './src/api/image';
 import ranking from './src/api/ranking';
 
 const bodyParser = require('body-parser');
@@ -21,6 +22,7 @@ app.get('/', (_req, res) => {
 app.use(user);
 app.use(game);
 app.use(ranking);
+app.use(image);
 httpServer.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });

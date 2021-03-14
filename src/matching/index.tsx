@@ -32,11 +32,11 @@ const Matching = () => {
       const matchingData = await getFindOtherUser();
       clearCache();
       await Promise.all(
-        new Array(16).map((_key, i) => {
+        new Array(16).fill('').map((_key, i) => {
           return getCropImage(i + 1);
         }),
       );
-      setWaitTime(() => 4);
+      setWaitTime(4);
       setMatchingData({
         user: matchingData.user,
         puzzleSet: matchingData.puzzleSet,

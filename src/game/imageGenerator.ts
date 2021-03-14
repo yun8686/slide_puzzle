@@ -1,5 +1,5 @@
-const panelImg = require('../assets/panel.png');
-const panelImg2 = require('../assets/panel2.png');
+const panelImg = require('../../assets/panel.png');
+const panelImg2 = require('../../assets/panel2.png');
 import ImageEditor from '@react-native-community/image-editor';
 import {Image} from 'react-native';
 
@@ -11,8 +11,9 @@ export const clearCache = () => {
 };
 export const getCropImage = async (number: number) => {
   if (!ImageCatche[number]) {
+    console.log('Cropping', number);
     ImageCatche[number] = await ImageEditor.cropImage(
-      Image.resolveAssetSource(panelImg).uri,
+      'http://153.126.161.193:8080/image/puzzle',
       {
         offset: {
           x: Math.floor((number - 1) % 4) * 160,

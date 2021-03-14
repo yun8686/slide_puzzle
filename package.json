@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "android": "./android/gradlew && react-native run-android",
+    "android:release": "react-native run-android --variant=release",
     "ios": "react-native run-ios",
     "start": "concurrently \"react-native start\" \"cd slide_puzzle_api && yarn start\"",
     "test": "jest",

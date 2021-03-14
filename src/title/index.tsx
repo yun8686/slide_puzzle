@@ -25,10 +25,15 @@ const Title = () => {
 
   const [me, setMe] = useState<User>();
   useEffect(() => {
-    getMeFetch().then((me) => {
-      updateMe(me);
-      setMe(me);
-    });
+    getMeFetch()
+      .then((me) => {
+        updateMe(me);
+        setMe(me);
+      })
+      .catch((e) => {
+        alert('error getMeFetch' + JSON.stringify(e));
+        console.log('ERROR getMeFetch', e);
+      });
     return () => {};
   }, []);
   if (!me) {
@@ -123,9 +128,14 @@ const RankingModal = ({onDismiss}: {onDismiss: () => void}) => {
   const [shown, setShown] = useState<boolean>(false);
   useEffect(() => {
     if (shown)
-      getRanking().then((rankings) => {
-        setRankingList(rankings);
-      });
+      getRanking()
+        .then((rankings) => {
+          setRankingList(rankings);
+        })
+        .catch((e) => {
+          alert('error setRankingList');
+          console.log('ERROR setRankingList', e);
+        });
   }, [shown]);
   return (
     <Modal

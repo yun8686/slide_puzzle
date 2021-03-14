@@ -1,7 +1,4 @@
-const panelImg = require('../../assets/panel.png');
-const panelImg2 = require('../../assets/panel2.png');
 import ImageEditor from '@react-native-community/image-editor';
-import {Image} from 'react-native';
 
 const ImageCatche: {[number: string]: string} = {};
 export const clearCache = () => {

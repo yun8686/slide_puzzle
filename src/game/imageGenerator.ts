@@ -8,7 +8,6 @@ export const clearCache = () => {
 };
 export const getCropImage = async (number: number) => {
   if (!ImageCatche[number]) {
-    console.log('Cropping', number);
     ImageCatche[number] = await ImageEditor.cropImage(
       'http://153.126.161.193:8080/image/puzzle',
       {

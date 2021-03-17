@@ -97,7 +97,7 @@ const Game = ({route}: Props) => {
             }
           }}
           onClickBackToTitle={() => {
-            navigation.replace('Title');
+            navigation.pop();
           }}
         />
       ) : null}

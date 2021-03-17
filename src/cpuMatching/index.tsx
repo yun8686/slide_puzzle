@@ -74,9 +74,7 @@ type FindingProps = {
 const Finding = ({otherUser, onCancel, waitTime}: FindingProps) => {
   return (
     <View style={styles.conteiner}>
-      <Text style={{fontSize: 24}}>
-        {otherUser ? 'Matched other player' : 'Looking for opponent...'}
-      </Text>
+      <Text style={{fontSize: 24}}>vs Computer Mode</Text>
       <View
         style={{
           height: '40%',
@@ -89,7 +87,9 @@ const Finding = ({otherUser, onCancel, waitTime}: FindingProps) => {
         {otherUser ? <UserInfo user={otherUser} /> : null}
       </View>
       <Text style={{fontSize: 24}}>
-        {otherUser ? `connecting${['...', '.. ', '.  '][waitTime % 3]}` : ' '}
+        {otherUser
+          ? `Shuffling the puzzle${['...', '.. ', '.  '][waitTime % 3]}`
+          : ' '}
       </Text>
     </View>
   );
@@ -110,7 +110,9 @@ const UserInfo = ({user}: {user: User}) => {
             paddingLeft: 20,
           }}>
           <Text style={{fontSize: 20}}>{user.name}</Text>
-          <Text style={{fontSize: 20}}>WinRate {user.winrate}</Text>
+          {user.deviceId !== 'cpu' ? (
+            <Text style={{fontSize: 20}}>WinRate {user.winrate}</Text>
+          ) : null}
         </View>
       </View>
     </Card>

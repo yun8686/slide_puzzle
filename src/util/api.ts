@@ -107,7 +107,7 @@ const createCPUPuzzleSet = (cpuName: string): FindOtherUser => {
     user: {
       deviceId: 'cpu',
       name: cpuName,
-      winrate: -10,
+      winrate: 0,
       region: getMe().region,
     },
     puzzleSet: {

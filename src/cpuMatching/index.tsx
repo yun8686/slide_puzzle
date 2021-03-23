@@ -35,17 +35,19 @@ const CpuMatching = () => {
           return getCropImage(i + 1);
         }),
       );
-      setWaitTime(() => 4);
+      setWaitTime(4);
       setMatchingData({
         user: matchingData.user,
         puzzleSet: matchingData.puzzleSet,
       });
     })();
+    return () => {};
   }, [getMe()]);
 
   useEffect(() => {
     if (waitTime === 0 && matchingData) {
       navigation.replace('Game', {matchingData, mode: 'CPU'});
+      return () => {};
     } else {
       const timeout = setTimeout(() => {
         setWaitTime(waitTime - 1);

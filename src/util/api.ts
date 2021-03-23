@@ -10,6 +10,7 @@ const API_HOST = '153.126.161.193:8080';
 const sleep = async (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+export const ImageUrl = `http://${API_HOST}/image/puzzle`;
 export const getRanking = async (): Promise<User[]> => {
   const deviceId = getUniqueId();
   return await (

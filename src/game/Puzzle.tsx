@@ -24,6 +24,7 @@ const Cell = ({
         console.log('error', e);
       }
     })();
+    return () => {};
   }, []);
 
   return (

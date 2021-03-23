@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {colors} from '../pallete';
 import {useNavigation} from '@react-navigation/native';
-import {getMe, updateMe, User} from '../models/user';
+import {updateMe, User} from '../models/user';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/FontAwesome';
 

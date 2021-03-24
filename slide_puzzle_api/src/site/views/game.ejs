@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  <ul style='list-style: none;'>
+  <% for ( const gameResult of gameResults ) { %>
+    <li style='border:1px solid'>
+      <div><%= gameResult.user.name %></div>
+      <div>time: <%= gameResult.puzzleSet.moveLogs[gameResult.puzzleSet.moveLogs.length - 1].time - gameResult.puzzleSet.moveLogs[0].time %></div>
+      <div>count: <%= gameResult.puzzleSet.moveLogs.length %></div>
+    </li>
+  <% } %>
+  </ul>
+</body>
+</html>

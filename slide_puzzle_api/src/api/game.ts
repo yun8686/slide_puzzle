@@ -9,10 +9,10 @@ import {User} from '../../../src/models/user';
 import {ServerPuzzleSet} from '../../../src/game/PuzzleSet';
 const router = Router();
 
-router.get<unknown, GameResults, null, {ignoreDeviceId: string}>(
+router.get<unknown, GameResults, null, {ignoreDeviceId: string; _id?: string}>(
   '/gameResult',
   async (req, res) => {
-    const {ignoreDeviceId} = req.query;
+    const {ignoreDeviceId, _id} = req.query;
     const db = await mongo();
     const gameCollection = getCollection(db);
     const result = await gameCollection

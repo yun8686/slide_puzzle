@@ -31,7 +31,7 @@ const Title = () => {
         setMe(me);
       })
       .catch((e) => {
-        alert('error getMeFetch' + JSON.stringify(e));
+        alert('network error');
         console.log('ERROR getMeFetch', e);
       });
     return () => {};
@@ -133,7 +133,7 @@ const RankingModal = ({onDismiss}: {onDismiss: () => void}) => {
           setRankingList(rankings);
         })
         .catch((e) => {
-          alert('error setRankingList');
+          alert('network error');
           console.log('ERROR setRankingList', e);
         });
   }, [shown]);

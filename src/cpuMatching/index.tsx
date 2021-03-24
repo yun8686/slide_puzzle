@@ -76,7 +76,7 @@ type FindingProps = {
 const Finding = ({otherUser, onCancel, waitTime}: FindingProps) => {
   return (
     <View style={styles.conteiner}>
-      <Text style={{fontSize: 24}}>vs Computer Mode</Text>
+      <Text style={{fontSize: 24}}>Single Play Mode</Text>
       <View
         style={{
           height: '40%',

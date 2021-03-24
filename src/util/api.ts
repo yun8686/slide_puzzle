@@ -5,16 +5,16 @@ import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
 import {Panel, GameMode} from '../game';
 
 // const API_HOST = 'localhost:8080';
-const API_HOST = '153.126.161.193:8080';
+const API_HOST = 'https://slidepuzzle.work';
 
 const sleep = async (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-export const ImageUrl = `http://${API_HOST}/image/puzzle`;
+export const ImageUrl = `${API_HOST}/image/puzzle`;
 export const getRanking = async (): Promise<User[]> => {
   const deviceId = getUniqueId();
   return await (
-    await fetch(`http://${API_HOST}/ranking?deviceId=${deviceId}`, {
+    await fetch(`${API_HOST}/ranking?deviceId=${deviceId}`, {
       method: 'GET',
     })
   ).json();
@@ -24,17 +24,16 @@ export const getMeFetch = async (): Promise<User> => {
   const deviceId = getUniqueId();
   const region = RNLocalize.getCountry();
   return await (
-    await fetch(
-      `http://${API_HOST}/user?deviceId=${deviceId}&region=${region}`,
-      {method: 'GET'},
-    )
+    await fetch(`${API_HOST}/user?deviceId=${deviceId}&region=${region}`, {
+      method: 'GET',
+    })
   ).json();
 };
 
 export const updateMeFetch = async (user: Partial<User>): Promise<User> => {
   const deviceId = getUniqueId();
   const result = await (
-    await fetch(`http://${API_HOST}/user`, {
+    await fetch(`${API_HOST}/user`, {
       method: 'POST',
       body: JSON.stringify({user, deviceId}),
       headers: {
@@ -59,7 +58,7 @@ export const getFindOtherUser = async (
     return createCPUPuzzleSet('computer');
   }
   const result = (await (
-    await fetch(`http://${API_HOST}/gameResult?ignoreDeviceId=${me.deviceId}`, {
+    await fetch(`${API_HOST}/gameResult?ignoreDeviceId=${me.deviceId}`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -83,7 +82,7 @@ export const sendPuzzleSet = async (
 ) => {
   const me = getMe();
   const result = await (
-    await fetch(`http://${API_HOST}/gameResult`, {
+    await fetch(`${API_HOST}/gameResult`, {
       method: 'POST',
       body: JSON.stringify({
         user: me,

@@ -18,7 +18,7 @@ router.get<unknown, GameResults, null, {deviceId: string; _id?: string}>(
     const {deviceId, _id} = req.query;
     const db = await mongo();
     const gameCollection = getCollection(db);
-    const resolveTime = await getSolveTimeAverage(db, deviceId);
+    const resolveTime = (await getSolveTimeAverage(db, deviceId)) || 30000;
     const result = await gameCollection
       .aggregate([
         {
@@ -34,7 +34,7 @@ router.get<unknown, GameResults, null, {deviceId: string; _id?: string}>(
       } else {
         return prev;
       }
-    }, result[0] as GameResults);
+    }, result[0]);
     res.send(nearResult);
   },
 );

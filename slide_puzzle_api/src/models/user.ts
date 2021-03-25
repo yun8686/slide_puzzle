@@ -16,7 +16,7 @@ export const getCollection = (db: Db) => {
 export const getSolveTimeAverage = async (db: Db, deviceId: string) => {
   const result = await getGameCollection(db)
     .aggregate<{avetime: number}>([
-      {$match: {'user.deviceId': deviceId + deviceId}},
+      {$match: {'user.deviceId': deviceId}},
       {
         $addFields: {
           firstMove: {

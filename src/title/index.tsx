@@ -27,7 +27,6 @@ const Title = () => {
   useEffect(() => {
     getMeFetch()
       .then((me) => {
-        updateMe(me);
         setMe(me);
       })
       .catch((e) => {

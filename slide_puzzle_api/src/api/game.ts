@@ -3,28 +3,47 @@ export const sendWinPuzzleSet = () => {};
 import {Router} from 'express';
 import {mongo} from '../mongo';
 import {getCollection, GameResults} from '../models/game';
-import {getCollection as getUserCollection} from '../models/user';
+import {
+  getCollection as getUserCollection,
+  getSolveTimeAverage,
+} from '../models/user';
 import {GameMode} from '../../../src/game';
 import {User} from '../../../src/models/user';
 import {ServerPuzzleSet} from '../../../src/game/PuzzleSet';
 const router = Router();
 
-router.get<unknown, GameResults, null, {ignoreDeviceId: string; _id?: string}>(
+router.get<unknown, GameResults, null, {deviceId: string; _id?: string}>(
   '/gameResult',
   async (req, res) => {
-    const {ignoreDeviceId, _id} = req.query;
+    const {deviceId, _id} = req.query;
     const db = await mongo();
     const gameCollection = getCollection(db);
+    const resolveTime = await getSolveTimeAverage(db, deviceId);
     const result = await gameCollection
       .aggregate([
         {
-          $sample: {size: 1},
+          $sample: {size: 10},
         },
       ])
       .toArray();
-    res.send(result[0]);
+    const nearResult = result.reduce((prev, curr) => {
+      const prevTimeDiff = Math.abs(getGameTime(prev) - resolveTime);
+      const currTImeDiff = Math.abs(getGameTime(curr) - resolveTime);
+      if (prevTimeDiff > currTImeDiff) {
+        return curr;
+      } else {
+        return prev;
+      }
+    }, result[0] as GameResults);
+    res.send(nearResult);
   },
 );
+
+const getGameTime = (gameResult: GameResults) => {
+  const moveLogs = gameResult.puzzleSet.moveLogs;
+  const lastIndex = moveLogs.length - 1;
+  return moveLogs[lastIndex].time - moveLogs[0].time;
+};
 
 router.post<
   unknown,

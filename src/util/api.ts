@@ -1,4 +1,4 @@
-import {User, getMe} from '../models/user';
+import {User, getMe, updateMe} from '../models/user';
 import {getUniqueId} from 'react-native-device-info';
 import RNLocalize from 'react-native-localize';
 import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
@@ -23,11 +23,13 @@ export const getRanking = async (): Promise<User[]> => {
 export const getMeFetch = async (): Promise<User> => {
   const deviceId = getUniqueId();
   const region = RNLocalize.getCountry();
-  return await (
+  const me = await (
     await fetch(`${API_HOST}/user?deviceId=${deviceId}&region=${region}`, {
       method: 'GET',
     })
   ).json();
+  updateMe(me);
+  return me;
 };
 
 export const updateMeFetch = async (user: Partial<User>): Promise<User> => {
@@ -58,7 +60,7 @@ export const getFindOtherUser = async (
     return createCPUPuzzleSet('computer');
   }
   const result = (await (
-    await fetch(`${API_HOST}/gameResult?ignoreDeviceId=${me.deviceId}`, {
+    await fetch(`${API_HOST}/gameResult?deviceId=${me.deviceId}`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -98,6 +100,7 @@ export const sendPuzzleSet = async (
       },
     })
   ).json();
+  await getMeFetch();
   return result;
 };
 

@@ -127,7 +127,7 @@ const UserInfo = ({user}: {user: User}) => {
             paddingLeft: 20,
           }}>
           <Text style={{fontSize: 20}}>{user.name}</Text>
-          <Text style={{fontSize: 20}}>WinRate {user.winrate}</Text>
+          <Text style={{fontSize: 20}}>Number of wins {user.winrate}</Text>
         </View>
       </View>
     </Card>

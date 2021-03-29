@@ -9,9 +9,12 @@
     <input name="title" required>
     <button type="submit">送信</button>
   </form>
-  <ul style='list-style: none;'>
+  <ul style='list-style: none;display:flex'>
   <% for ( const imageResult of imageResults ) { %>
-    <image style='width:320px;height:320px' src='/view/image/<%= imageResult._id %>'></div>
+  <div style="border:1px solid; width:320px; margin:4px">
+    <p><%= imageResult.title %></p>
+    <image style='width:320px;height:320px' src='/view/image/<%= imageResult._id %>'>
+  </div>
   <% } %>
   </ul>
 </body>

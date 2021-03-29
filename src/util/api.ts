@@ -4,7 +4,7 @@ import RNLocalize from 'react-native-localize';
 import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
 import {Panel, GameMode} from '../game';
 
-// const API_HOST = 'localhost:8080';
+//const API_HOST = 'http://192.168.0.25:8080';
 const API_HOST = 'https://slidepuzzle.work';
 
 const sleep = async (ms: number) =>

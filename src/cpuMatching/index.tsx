@@ -113,7 +113,7 @@ const UserInfo = ({user}: {user: User}) => {
           }}>
           <Text style={{fontSize: 20}}>{user.name}</Text>
           {user.deviceId !== 'cpu' ? (
-            <Text style={{fontSize: 20}}>WinRate {user.winrate}</Text>
+            <Text style={{fontSize: 20}}>Number of wins {user.winrate}</Text>
           ) : null}
         </View>
       </View>

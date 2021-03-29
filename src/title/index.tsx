@@ -82,6 +82,13 @@ const Title = () => {
             style={styles.button}>
             <Text style={styles.text}>ONLINE PLAY</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.push('Gallary');
+            }}
+            style={styles.button}>
+            <Text style={styles.text}>GALLARY</Text>
+          </TouchableOpacity>
         </View>
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity onPress={() => setIsEditNameModal(true)}>
@@ -363,6 +370,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     backgroundColor: colors.buttonColor,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },

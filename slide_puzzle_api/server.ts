@@ -5,6 +5,7 @@ import game from './src/api/game';
 import image from './src/api/image';
 import ranking from './src/api/ranking';
 import gameview from './src/site/controller/game';
+import imageview from './src/site/controller/image';
 
 const bodyParser = require('body-parser');
 
@@ -28,6 +29,7 @@ app.use(image);
 app.set('view engine', 'ejs');
 app.set('views', './src/site/views');
 app.get('/view/game', gameview);
+app.use(imageview);
 
 httpServer.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);

@@ -1,9 +1,18 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {RootStackParamList} from '../../App';
-import {SafeAreaView, StyleSheet, View, Text, Dimensions} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  Image,
+} from 'react-native';
 import {colors} from '../pallete';
 import {scale} from 'react-native-size-matters';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+import {getGallary, getImageUrl} from '../util/api';
+import {ImageInfo} from '../../slide_puzzle_api/src/models/image';
 
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
@@ -11,17 +20,34 @@ type Props = {
   route: {params: RootStackParamList['Gallary']};
 };
 const Gallary = ({route}: Props) => {
+  const [gallary, setGallary] = useState<ImageInfo[]>();
+  useEffect(() => {
+    (async () => {
+      const gallary = await getGallary();
+      setGallary(gallary);
+    })();
+    return () => {};
+  }, []);
   return (
     <SafeAreaView>
       <View style={styles.container}>
         <Text style={{alignSelf: 'center', fontSize: scale(32)}}>Gallary</Text>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {new Array(30).fill(0).map((v) => (
-            <TouchableOpacity style={styles.cardWrapper}>
-              <View style={styles.cardImage}></View>
-              <Text style={styles.cardText}>Cat</Text>
-            </TouchableOpacity>
-          ))}
+          {gallary
+            ? gallary.map((v) => (
+                <TouchableOpacity style={styles.cardWrapper} key={`${v._id}`}>
+                  <View style={styles.cardImage}>
+                    <Image
+                      source={{
+                        uri: getImageUrl(v),
+                      }}
+                      style={styles.cardImage}
+                    />
+                  </View>
+                  <Text style={styles.cardText}>{v.title}</Text>
+                </TouchableOpacity>
+              ))
+            : null}
         </ScrollView>
       </View>
     </SafeAreaView>

@@ -3,7 +3,9 @@ import {getUniqueId} from 'react-native-device-info';
 import RNLocalize from 'react-native-localize';
 import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
 import {Panel, GameMode} from '../game';
+import {ImageInfo} from '../../slide_puzzle_api/src/models/image';
 
+//const API_HOST = 'http://localhost:8080';
 //const API_HOST = 'http://192.168.0.25:8080';
 const API_HOST = 'https://slidepuzzle.work';
 
@@ -11,6 +13,9 @@ const sleep = async (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export const ImageUrl = `${API_HOST}/image/puzzle`;
+export const getImageUrl = (imageInfo: ImageInfo) => {
+  return `${API_HOST}/view/image/${imageInfo._id}`;
+};
 export const getRanking = async (): Promise<User[]> => {
   const deviceId = getUniqueId();
   return await (
@@ -126,4 +131,15 @@ const createCPUPuzzleSet = (cpuName: string): FindOtherUser => {
     },
   };
   return makeObj;
+};
+
+export const getGallary = async (): Promise<ImageInfo[]> => {
+  const result = await await fetch(`${API_HOST}/image/gallary`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  });
+  return (await result.json()).imageInfo;
 };

@@ -1,7 +1,7 @@
-import {Db} from 'mongodb';
+import {Db, ObjectId} from 'mongodb';
 
 export type ImageInfo = {
-  _id: string;
+  _id?: ObjectId;
   title: string;
   url: string;
 };

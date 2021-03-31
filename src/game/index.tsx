@@ -31,6 +31,7 @@ const Game = ({route}: Props) => {
   const {
     mode: gameMode,
     matchingData: {user: otherUser, puzzleSet: basePuzzleSet},
+    imageUri: fullImageUri,
   } = route.params;
   const [panel, setPanel] = useState<PuzzleSet>();
   const [otherPanel, setOtherPanel] = useState<PuzzleSet>();
@@ -89,7 +90,7 @@ const Game = ({route}: Props) => {
   return (
     <SafeAreaView>
       {waitTime >= 0 ? <WaitingModal waitTime={waitTime} /> : null}
-      {isModelModal ? <ModelModal /> : null}
+      {isModelModal ? <ModelModal imageUri={fullImageUri} /> : null}
       {isWon || isLose ? (
         <ResultModal
           isWin={isWon}
@@ -234,7 +235,7 @@ const CenterModal = ({
   );
 };
 
-const ModelModal = () => {
+const ModelModal = ({imageUri}: {imageUri: string}) => {
   return (
     <Modal isVisible={true}>
       <View
@@ -247,7 +248,7 @@ const ModelModal = () => {
           alignItems: 'center',
         }}>
         <Image
-          source={{uri: ImageUrl}}
+          source={{uri: imageUri}}
           style={{width: WINDOW_WIDTH, height: WINDOW_WIDTH}}></Image>
       </View>
     </Modal>

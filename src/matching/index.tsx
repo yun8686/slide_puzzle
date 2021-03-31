@@ -12,9 +12,9 @@ import {colors} from '../pallete';
 import {User, getMe} from '../models/user';
 import {useNavigation} from '@react-navigation/native';
 import {RoomId, MatchingData} from '../models/room';
-import {getFindOtherUser} from '../util/api';
+import {getFindOtherUser, ImageUrl} from '../util/api';
 import {Flag} from 'react-native-svg-flagkit';
-import {getCropImage, clearCache} from '../game/imageGenerator';
+import {getCropImage} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
 import {BallIndicator} from 'react-native-indicators';
 import {Card} from 'react-native-elements';
@@ -30,7 +30,6 @@ const Matching = () => {
   useEffect(() => {
     (async () => {
       const matchingData = await getFindOtherUser();
-      clearCache();
       await Promise.all(
         new Array(16).fill('').map((_key, i) => {
           return getCropImage(i + 1);
@@ -46,7 +45,11 @@ const Matching = () => {
 
   useEffect(() => {
     if (waitTime === 0 && matchingData) {
-      navigation.replace('Game', {matchingData, mode: 'PLAYER'});
+      navigation.replace('Game', {
+        matchingData,
+        mode: 'PLAYER',
+        imageUri: ImageUrl,
+      });
     } else {
       const timeout = setTimeout(() => {
         setWaitTime(waitTime - 1);

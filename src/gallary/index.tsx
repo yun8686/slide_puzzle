@@ -13,6 +13,8 @@ import {scale} from 'react-native-size-matters';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {getGallary, getImageUrl} from '../util/api';
 import {ImageInfo} from '../../slide_puzzle_api/src/models/image';
+import {getFullPuzzleImage} from '../util/cache/image';
+import {BallIndicator} from 'react-native-indicators';
 
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
@@ -24,7 +26,14 @@ const Gallary = ({route}: Props) => {
   useEffect(() => {
     (async () => {
       const gallary = await getGallary();
-      setGallary(gallary);
+      const localGallary: ImageInfo[] = [];
+      for (const g of gallary) {
+        localGallary.push({
+          ...g,
+          url: await getFullPuzzleImage(getImageUrl(g)),
+        });
+      }
+      setGallary(localGallary);
     })();
     return () => {};
   }, []);
@@ -32,23 +41,25 @@ const Gallary = ({route}: Props) => {
     <SafeAreaView>
       <View style={styles.container}>
         <Text style={{alignSelf: 'center', fontSize: scale(32)}}>Gallary</Text>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {gallary
-            ? gallary.map((v) => (
-                <TouchableOpacity style={styles.cardWrapper} key={`${v._id}`}>
-                  <View style={styles.cardImage}>
-                    <Image
-                      source={{
-                        uri: getImageUrl(v),
-                      }}
-                      style={styles.cardImage}
-                    />
-                  </View>
-                  <Text style={styles.cardText}>{v.title}</Text>
-                </TouchableOpacity>
-              ))
-            : null}
-        </ScrollView>
+        {gallary ? (
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            {gallary.map((v) => (
+              <TouchableOpacity style={styles.cardWrapper} key={`${v._id}`}>
+                <View style={styles.cardImage}>
+                  <Image
+                    source={{
+                      uri: v.url,
+                    }}
+                    style={styles.cardImage}
+                  />
+                </View>
+                <Text style={styles.cardText}>{v.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        ) : (
+          <BallIndicator size={60} />
+        )}
       </View>
     </SafeAreaView>
   );

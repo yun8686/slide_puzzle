@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageEditor from '@react-native-community/image-editor';
 import RNFS from 'react-native-fs';
 
-const getFullPuzzleImage = async (imageUrl: string) => {
+export const getFullPuzzleImage = async (imageUrl: string) => {
   const storageKey = `PuzzleImageCache__${imageUrl}`;
   let image = await AsyncStorage.getItem(storageKey);
   const isExists = image ? await RNFS.exists(image) : false;

@@ -12,9 +12,9 @@ import {colors} from '../pallete';
 import {User, getMe} from '../models/user';
 import {useNavigation} from '@react-navigation/native';
 import {RoomId, MatchingData} from '../models/room';
-import {getFindOtherUser} from '../util/api';
+import {getFindOtherUser, ImageUrl} from '../util/api';
 import {Flag} from 'react-native-svg-flagkit';
-import {getCropImage, clearCache} from '../game/imageGenerator';
+import {getCropImage} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
 import {Card} from 'react-native-elements';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
@@ -29,7 +29,6 @@ const CpuMatching = () => {
   useEffect(() => {
     (async () => {
       const matchingData = await getFindOtherUser(true);
-      clearCache();
       await Promise.all(
         new Array(16).fill('').map((_key, i) => {
           return getCropImage(i + 1);
@@ -46,7 +45,11 @@ const CpuMatching = () => {
 
   useEffect(() => {
     if (waitTime === 0 && matchingData) {
-      navigation.replace('Game', {matchingData, mode: 'CPU'});
+      navigation.replace('Game', {
+        matchingData,
+        mode: 'CPU',
+        imageUri: ImageUrl,
+      });
       return () => {};
     } else {
       const timeout = setTimeout(() => {

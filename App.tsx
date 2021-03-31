@@ -25,7 +25,7 @@ export type RootStackParamList = {
   Title: undefined;
   CpuMatching: undefined;
   Matching: undefined;
-  Game: {matchingData: MatchingData; mode: GameMode};
+  Game: {matchingData: MatchingData; mode: GameMode; imageUri: string};
   Gallary: undefined;
 };
 

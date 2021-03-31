@@ -6,7 +6,10 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from 'react-native';
+import Modal from 'react-native-modal';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import Puzzle from './Puzzle';
 import {colors} from '../pallete';
 import {User} from '../models/user';
@@ -14,7 +17,7 @@ import {RootStackParamList} from '../../App';
 import {PuzzleSet} from './PuzzleSet';
 import {useNavigation} from '@react-navigation/native';
 import {Flag} from 'react-native-svg-flagkit';
-import {sendPuzzleSet} from '../util/api';
+import {sendPuzzleSet, ImageUrl} from '../util/api';
 
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 const PANE_SIZE = 4;
@@ -32,6 +35,7 @@ const Game = ({route}: Props) => {
   const [panel, setPanel] = useState<PuzzleSet>();
   const [otherPanel, setOtherPanel] = useState<PuzzleSet>();
   const [waitTime, setWaitTime] = useState(5);
+  const [isModelModal, setModelModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (basePuzzleSet) {
@@ -85,6 +89,7 @@ const Game = ({route}: Props) => {
   return (
     <SafeAreaView>
       {waitTime >= 0 ? <WaitingModal waitTime={waitTime} /> : null}
+      {isModelModal ? <ModelModal /> : null}
       {isWon || isLose ? (
         <ResultModal
           isWin={isWon}
@@ -121,6 +126,18 @@ const Game = ({route}: Props) => {
           }}
           panelSize={PANE_SIZE}
         />
+        <View style={{padding: 30}}>
+          <TouchableOpacity
+            onPressIn={() => setModelModal(true)}
+            onPressOut={() => setModelModal(false)}>
+            <Icon
+              style={{alignSelf: 'center'}}
+              name="image"
+              color={colors.settingColor}
+              size={50}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -214,6 +231,26 @@ const CenterModal = ({
         {children}
       </View>
     </View>
+  );
+};
+
+const ModelModal = () => {
+  return (
+    <Modal isVisible={true}>
+      <View
+        style={{
+          position: 'absolute',
+          zIndex: 1,
+          width: '100%',
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Image
+          source={{uri: ImageUrl}}
+          style={{width: WINDOW_WIDTH, height: WINDOW_WIDTH}}></Image>
+      </View>
+    </Modal>
   );
 };
 

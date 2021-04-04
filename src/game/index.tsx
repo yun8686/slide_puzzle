@@ -127,14 +127,15 @@ const Game = ({route}: Props) => {
           }}
           panelSize={PANE_SIZE}
         />
-        <View style={{padding: 30}}>
+
+        <View style={styles.modelButton}>
           <TouchableOpacity
             onPressIn={() => setModelModal(true)}
             onPressOut={() => setModelModal(false)}>
             <Icon
               style={{alignSelf: 'center'}}
               name="image"
-              color={colors.settingColor}
+              color={colors.circleButtonIconColor}
               size={50}
             />
           </TouchableOpacity>
@@ -249,7 +250,11 @@ const ModelModal = ({imageUri}: {imageUri: string}) => {
         }}>
         <Image
           source={{uri: imageUri}}
-          style={{width: WINDOW_WIDTH, height: WINDOW_WIDTH}}></Image>
+          style={{
+            width: WINDOW_WIDTH,
+            height: WINDOW_WIDTH,
+            marginTop: 50,
+          }}></Image>
       </View>
     </Modal>
   );
@@ -298,5 +303,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     margin: 3,
     marginTop: 20,
+  },
+  modelButton: {
+    width: 90,
+    height: 90,
+    alignSelf: 'flex-end',
+    borderRadius: 90,
+    borderWidth: 1,
+    borderColor: colors.circleButtonColor,
+    backgroundColor: colors.circleButtonColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30,
+    marginRight: 10,
   },
 });

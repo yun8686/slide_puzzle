@@ -8,6 +8,7 @@ import {
   Dimensions,
   Image,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import {colors} from '../pallete';
 import {scale} from 'react-native-size-matters';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
@@ -21,16 +22,21 @@ const WINDOW_WIDTH = Dimensions.get('screen').width;
 type Props = {
   route: {params: RootStackParamList['Gallary']};
 };
+interface LocalImageInfo extends ImageInfo {
+  localUri: string;
+}
 const Gallary = ({route}: Props) => {
-  const [gallary, setGallary] = useState<ImageInfo[]>();
+  const navigation = useNavigation();
+  const [gallary, setGallary] = useState<LocalImageInfo[]>();
+  const [isNavigate, setIsNavigate] = useState<boolean>();
   useEffect(() => {
     (async () => {
       const gallary = await getGallary();
-      const localGallary: ImageInfo[] = [];
+      const localGallary: LocalImageInfo[] = [];
       for (const g of gallary) {
         localGallary.push({
           ...g,
-          url: await getFullPuzzleImage(getImageUrl(g)),
+          localUri: await getFullPuzzleImage(getImageUrl(g)),
         });
       }
       setGallary(localGallary);
@@ -44,11 +50,21 @@ const Gallary = ({route}: Props) => {
         {gallary ? (
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             {gallary.map((v) => (
-              <TouchableOpacity style={styles.cardWrapper} key={`${v._id}`}>
+              <TouchableOpacity
+                style={styles.cardWrapper}
+                key={`${v._id}`}
+                onPress={() => {
+                  if (!isNavigate) {
+                    setIsNavigate(true);
+                    navigation.replace('Matching', {
+                      imageUri: v.localUri,
+                    });
+                  }
+                }}>
                 <View style={styles.cardImage}>
                   <Image
                     source={{
-                      uri: v.url,
+                      uri: v.localUri,
                     }}
                     style={styles.cardImage}
                   />

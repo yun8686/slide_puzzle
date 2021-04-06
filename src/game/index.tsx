@@ -17,9 +17,12 @@ import {RootStackParamList} from '../../App';
 import {PuzzleSet} from './PuzzleSet';
 import {useNavigation} from '@react-navigation/native';
 import {Flag} from 'react-native-svg-flagkit';
-import {sendPuzzleSet, ImageUrl} from '../util/api';
+import {sendPuzzleSet} from '../util/api';
 
-const WINDOW_WIDTH = Dimensions.get('screen').width;
+const {width, height} = Dimensions.get('screen');
+const WINDOW_WIDTH = width;
+const PUZZLE_WIDTH = Math.min(WINDOW_WIDTH, height / 2);
+console.log('PUZZLE_WIDTH', PUZZLE_WIDTH);
 const PANE_SIZE = 4;
 export type GameMode = 'CPU' | 'PLAYER';
 export type Panel = number[] & {__panel: never};
@@ -31,12 +34,13 @@ const Game = ({route}: Props) => {
   const {
     mode: gameMode,
     matchingData: {user: otherUser, puzzleSet: basePuzzleSet},
-    imageUri: fullImageUri,
+    imageUri,
   } = route.params;
   const [panel, setPanel] = useState<PuzzleSet>();
   const [otherPanel, setOtherPanel] = useState<PuzzleSet>();
   const [waitTime, setWaitTime] = useState(5);
   const [isModelModal, setModelModal] = useState<boolean>(false);
+  const [isNavigated, setIsNavigated] = useState<boolean>(false);
 
   useEffect(() => {
     if (basePuzzleSet) {
@@ -90,16 +94,19 @@ const Game = ({route}: Props) => {
   return (
     <SafeAreaView>
       {waitTime >= 0 ? <WaitingModal waitTime={waitTime} /> : null}
-      {isModelModal ? <ModelModal imageUri={fullImageUri} /> : null}
+      {isModelModal ? <ModelModal imageUri={imageUri} /> : null}
       {isWon || isLose ? (
         <ResultModal
           isWin={isWon}
           panel={panel}
           onClickNextGame={() => {
-            if (gameMode === 'CPU') {
-              navigation.replace('CpuMatching');
-            } else if (gameMode === 'PLAYER') {
-              navigation.replace('Matching');
+            if (!isNavigated) {
+              setIsNavigated(true);
+              if (gameMode === 'CPU') {
+                navigation.replace('CpuMatching');
+              } else if (gameMode === 'PLAYER') {
+                navigation.replace('Matching');
+              }
             }
           }}
           onClickBackToTitle={() => {
@@ -113,13 +120,15 @@ const Game = ({route}: Props) => {
             <UserInfo user={otherUser} />
           </View>
           <Puzzle
-            width={WINDOW_WIDTH / 3}
+            imageUri={imageUri}
+            width={~~(PUZZLE_WIDTH / 12) * 4}
             panel={otherPanel.getPanel()}
             panelSize={PANE_SIZE}
           />
         </View>
         <Puzzle
-          width={WINDOW_WIDTH}
+          imageUri={imageUri}
+          width={PUZZLE_WIDTH}
           panel={panel.getPanel()}
           onTouchIndex={(nextIndex) => {
             panel.moveTo(nextIndex, true);
@@ -127,18 +136,19 @@ const Game = ({route}: Props) => {
           }}
           panelSize={PANE_SIZE}
         />
-
-        <View style={styles.modelButton}>
-          <TouchableOpacity
-            onPressIn={() => setModelModal(true)}
-            onPressOut={() => setModelModal(false)}>
-            <Icon
-              style={{alignSelf: 'center'}}
-              name="image"
-              color={colors.circleButtonIconColor}
-              size={50}
-            />
-          </TouchableOpacity>
+        <View style={styles.footerContainer}>
+          <View style={styles.modelButton}>
+            <TouchableOpacity
+              onPressIn={() => setModelModal(true)}
+              onPressOut={() => setModelModal(false)}>
+              <Icon
+                style={{alignSelf: 'center'}}
+                name="image"
+                color={colors.circleButtonIconColor}
+                size={50}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -269,13 +279,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundColor,
   },
   headerContainer: {
+    flexGrow: 1,
+    flexShrink: 1,
     backgroundColor: colors.backgroundColor,
     justifyContent: 'space-between',
     alignItems: 'center',
+    alignSelf: 'center',
     flexDirection: 'row',
     width: WINDOW_WIDTH,
-    height: WINDOW_WIDTH / 2,
+    maxWidth: PUZZLE_WIDTH,
     padding: 20,
+  },
+  footerContainer: {
+    flexGrow: 1,
+    flexShrink: 1,
+    width: '100%',
+    maxWidth: PUZZLE_WIDTH,
+    backgroundColor: colors.backgroundColor,
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   userInfoWrapper: {flexGrow: 1, marginRight: 20},
   board: {},
@@ -314,7 +336,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.circleButtonColor,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 30,
     marginRight: 10,
   },
 });

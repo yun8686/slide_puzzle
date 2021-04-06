@@ -17,9 +17,15 @@ import {Flag} from 'react-native-svg-flagkit';
 import {getCropImage} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
 import {Card} from 'react-native-elements';
+import {RootStackParamList} from '../../App';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
-const CpuMatching = () => {
+type Props = {
+  route: {params: RootStackParamList['CpuMatching']};
+};
+const CpuMatching = ({route}: Props) => {
+  const imageUri = route.params?.imageUri ?? ImageUrl;
+
   const [matchingData, setMatchingData] = useState<MatchingData | undefined>(
     undefined,
   );
@@ -31,7 +37,7 @@ const CpuMatching = () => {
       const matchingData = await getFindOtherUser(true);
       await Promise.all(
         new Array(16).fill('').map((_key, i) => {
-          return getCropImage(i + 1);
+          return getCropImage(imageUri, i + 1);
         }),
       );
       setWaitTime(4);
@@ -48,7 +54,7 @@ const CpuMatching = () => {
       navigation.replace('Game', {
         matchingData,
         mode: 'CPU',
-        imageUri: ImageUrl,
+        imageUri: imageUri,
       });
       return () => {};
     } else {

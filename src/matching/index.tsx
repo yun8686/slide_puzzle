@@ -18,9 +18,15 @@ import {getCropImage} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
 import {BallIndicator} from 'react-native-indicators';
 import {Card} from 'react-native-elements';
+import {RootStackParamList} from '../../App';
 const WINDOW_WIDTH = Dimensions.get('screen').width;
 
-const Matching = () => {
+type Props = {
+  route: {params: RootStackParamList['Matching']};
+};
+
+const Matching = ({route}: Props) => {
+  const imageUri = route.params?.imageUri ?? ImageUrl;
   const [matchingData, setMatchingData] = useState<MatchingData | undefined>(
     undefined,
   );
@@ -32,7 +38,7 @@ const Matching = () => {
       const matchingData = await getFindOtherUser();
       await Promise.all(
         new Array(16).fill('').map((_key, i) => {
-          return getCropImage(i + 1);
+          return getCropImage(imageUri, i + 1);
         }),
       );
       setWaitTime(4);
@@ -48,7 +54,7 @@ const Matching = () => {
       navigation.replace('Game', {
         matchingData,
         mode: 'PLAYER',
-        imageUri: ImageUrl,
+        imageUri: imageUri,
       });
     } else {
       const timeout = setTimeout(() => {

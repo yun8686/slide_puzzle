@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {colors} from '../pallete';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {updateMe, User} from '../models/user';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -22,7 +22,7 @@ const Title = () => {
   const navigation = useNavigation();
   const [isEditNameModal, setIsEditNameModal] = useState<boolean>(false);
   const [isRankingModal, setIsRankingModal] = useState<boolean>(false);
-
+  const route = useRoute();
   const [me, setMe] = useState<User>();
   useEffect(() => {
     getMeFetch()
@@ -71,20 +71,21 @@ const Title = () => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              navigation.push('CpuMatching');
+              navigation.navigate('CpuMatching');
             }}>
             <Text style={styles.text}>SINGLE PLAY</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.push('Matching');
+              navigation.navigate('Matching');
             }}
             style={styles.button}>
             <Text style={styles.text}>ONLINE PLAY</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.push('Gallary');
+              console.log('route,', route);
+              navigation.navigate('Gallary');
             }}
             style={styles.button}>
             <Text style={styles.text}>GALLARY</Text>

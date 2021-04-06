@@ -23,8 +23,8 @@ import Gallary from './src/gallary';
 
 export type RootStackParamList = {
   Title: undefined;
-  CpuMatching: undefined;
-  Matching: undefined;
+  CpuMatching: {imageUri: string};
+  Matching: {imageUri: string};
   Game: {matchingData: MatchingData; mode: GameMode; imageUri: string};
   Gallary: undefined;
 };

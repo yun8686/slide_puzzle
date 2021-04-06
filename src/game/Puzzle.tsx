@@ -4,11 +4,13 @@ import {Panel} from '.';
 import {getCropImage} from './imageGenerator';
 
 const Cell = ({
+  imageUri,
   num,
   onTouchEnd,
   shown,
   width,
 }: {
+  imageUri: string;
   num: number;
   shown: boolean;
   width: number;
@@ -18,7 +20,7 @@ const Cell = ({
   useEffect(() => {
     (async () => {
       try {
-        const image = await getCropImage(num);
+        const image = await getCropImage(imageUri, num);
         setImage(image);
       } catch (e) {
         console.log('error', e);
@@ -53,20 +55,23 @@ type Puzzle = {
   panel: Panel;
   onTouchIndex?: (index: number) => void;
   panelSize: number;
+  imageUri: string;
 };
-const Puzzle = ({width, panel, panelSize, onTouchIndex}: Puzzle) => {
+const Puzzle = ({width, panel, panelSize, onTouchIndex, imageUri}: Puzzle) => {
   return (
     <View
       style={{
         width: width,
         height: width,
         flexDirection: 'row',
+        alignSelf: 'center',
         flexWrap: 'wrap',
       }}>
       {panel.map((v, i) => {
         return (
           <Cell
             key={v}
+            imageUri={imageUri}
             width={width / panelSize}
             onTouchEnd={() => {
               onTouchIndex && onTouchIndex(i);

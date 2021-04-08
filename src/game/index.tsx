@@ -263,7 +263,9 @@ const ModelModal = ({imageUri}: {imageUri: string}) => {
           style={{
             width: WINDOW_WIDTH,
             height: WINDOW_WIDTH,
-            marginTop: 50,
+            maxWidth: PUZZLE_WIDTH,
+            maxHeight: PUZZLE_WIDTH,
+            marginTop: ~~(PUZZLE_WIDTH / 12) * 2 + 10,
           }}></Image>
       </View>
     </Modal>

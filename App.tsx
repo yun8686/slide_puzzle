@@ -20,12 +20,13 @@ import {RoomId, MatchingData} from './src/models/room';
 import {User} from './src/models/user';
 import CpuMatching from './src/cpuMatching';
 import Gallary from './src/gallary';
+import {ImageId} from './slide_puzzle_api/src/models/image';
 
 export type RootStackParamList = {
   Title: undefined;
-  CpuMatching: {imageUri: string};
-  Matching: {imageUri: string};
-  Game: {matchingData: MatchingData; mode: GameMode; imageUri: string};
+  CpuMatching: {imageId: ImageId};
+  Matching: {imageId: ImageId};
+  Game: {matchingData: MatchingData; mode: GameMode};
   Gallary: undefined;
 };
 

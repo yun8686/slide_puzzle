@@ -3,9 +3,9 @@ import {getUniqueId} from 'react-native-device-info';
 import RNLocalize from 'react-native-localize';
 import {PuzzleSet, ServerPuzzleSet} from '../game/PuzzleSet';
 import {Panel, GameMode} from '../game';
-import {ImageInfo} from '../../slide_puzzle_api/src/models/image';
+import {ImageInfo, ImageId} from '../../slide_puzzle_api/src/models/image';
 
-//const API_HOST = 'http://localhost:8080';
+// const API_HOST = 'http://localhost:8080';
 //const API_HOST = 'http://192.168.0.25:8080';
 const API_HOST = 'https://slidepuzzle.work';
 
@@ -13,8 +13,16 @@ const sleep = async (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export const ImageUrl = `${API_HOST}/image/puzzle`;
-export const getImageUrl = (imageInfo: ImageInfo) => {
-  return `${API_HOST}/view/image/${imageInfo._id}`;
+export const getImageUrl = (imageInfo?: ImageInfo | ImageId) => {
+  if (imageInfo) {
+    return `${API_HOST}/view/image/${
+      typeof imageInfo !== 'string' && '_id' in imageInfo
+        ? imageInfo._id
+        : imageInfo
+    }`;
+  } else {
+    return `${API_HOST}/view/image/panel`;
+  }
 };
 export const getRanking = async (): Promise<User[]> => {
   const deviceId = getUniqueId();
@@ -58,21 +66,34 @@ type FindOtherUser = {
 };
 
 export const getFindOtherUser = async (
-  isCpu?: boolean,
+  param:
+    | {
+        isCpu: true;
+        imageId: ImageId;
+      }
+    | {isCpu: false; imageId: ImageId},
 ): Promise<FindOtherUser> => {
+  console.log('getFindOtherUser', param);
   const me = getMe();
-  if (isCpu) {
-    return createCPUPuzzleSet('computer');
+  if (param.isCpu) {
+    return await createCPUPuzzleSet('computer', param.imageId);
   }
-  const result = (await (
-    await fetch(`${API_HOST}/gameResult?deviceId=${me.deviceId}`, {
+  const fetchResult = await fetch(
+    `${API_HOST}/gameResult?deviceId=${me.deviceId}&imageId=${
+      param.imageId ?? ''
+    }`,
+    {
       method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-    })
-  ).json()) as FindOtherUser;
+    },
+  );
+  const result = (await fetchResult.json()) as FindOtherUser | {user: null};
+  if (result.user === null) {
+    return await createCPUPuzzleSet('computer', param.imageId);
+  }
   await sleep(2000);
   return {
     ...result,
@@ -94,10 +115,7 @@ export const sendPuzzleSet = async (
       body: JSON.stringify({
         user: me,
         gameMode,
-        puzzleSet: {
-          originPanel: puzzleSet.getOriginPanel(),
-          moveLogs: puzzleSet.getMoveLogs(),
-        },
+        puzzleSet: puzzleSet.getServerPuzzleSet(),
       }),
       headers: {
         Accept: 'application/json',
@@ -109,8 +127,36 @@ export const sendPuzzleSet = async (
   return result;
 };
 
-const createCPUPuzzleSet = (cpuName: string): FindOtherUser => {
-  const results = new PuzzleSet(4, 1000);
+type GetImageId = {
+  imageId: ImageId;
+};
+
+const getImageId = async () => {
+  const result = (await (
+    await fetch(`${API_HOST}/image/defaultImageId`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+  ).json()) as GetImageId;
+  console.log('result', result);
+  return result;
+};
+
+const createCPUPuzzleSet = async (
+  cpuName: string,
+  imageId: ImageId,
+): Promise<FindOtherUser> => {
+  imageId = imageId ? imageId : (await getImageId()).imageId;
+  console.log('imageId', imageId);
+  const results = new PuzzleSet({
+    type: 'GenerateConstructor',
+    size: 4,
+    suffleTimes: 1000,
+    imageId,
+  });
   const makeObj: FindOtherUser = {
     user: {
       deviceId: 'cpu',
@@ -120,6 +166,7 @@ const createCPUPuzzleSet = (cpuName: string): FindOtherUser => {
     },
     puzzleSet: {
       type: 'ServerPuzzleSet',
+      imageId,
       originPanel: Array.from(results.getPanel()) as Panel,
       moveLogs: results
         .getRoutes()
@@ -134,7 +181,7 @@ const createCPUPuzzleSet = (cpuName: string): FindOtherUser => {
 };
 
 export const getGallary = async (): Promise<ImageInfo[]> => {
-  const result = await await fetch(`${API_HOST}/image/gallary`, {
+  const result = await fetch(`${API_HOST}/image/gallary`, {
     method: 'GET',
     headers: {
       Accept: 'application/json',

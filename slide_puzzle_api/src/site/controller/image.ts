@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {getCollection as getImageCollection} from '../../models/image';
+import {getCollection as getImageCollection, ImageId} from '../../models/image';
 import {mongo} from '../../mongo';
 import fs from 'fs';
 
@@ -21,14 +21,28 @@ router.post(ROUTE, upload.single('file'), async (req, res) => {
   const db = await mongo();
   const title = req.body.title;
   const imagePath = req.file?.destination + req.file?.filename;
-  await getImageCollection(db).insertOne({title: title, url: imagePath});
+  await getImageCollection(db).insertOne({
+    title: title,
+    url: imagePath,
+  });
   res.redirect(ROUTE);
 });
-
+router.get(ROUTE + '/panel', async (req, res) => {
+  const db = await mongo();
+  const result = await getImageCollection(db).findOne({
+    title: 'panel',
+  });
+  if (result) {
+    const buf = fs.readFileSync(result?.url);
+    res.send(buf);
+  } else {
+    res.send();
+  }
+});
 router.get(ROUTE + '/:imageId', async (req, res) => {
   const db = await mongo();
   const result = await getImageCollection(db).findOne({
-    _id: new ObjectID(req.params.imageId),
+    _id: ImageId(req.params.imageId),
   });
   if (result) {
     const buf = fs.readFileSync(result?.url);

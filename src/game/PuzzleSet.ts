@@ -1,5 +1,6 @@
 import {Panel} from '.';
 import PriorityQueue from 'fastpriorityqueue';
+import {ImageId} from '../../slide_puzzle_api/src/models/image';
 export type LogRow = {
   time: number;
   emptyIndex: number;
@@ -7,13 +8,37 @@ export type LogRow = {
 
 export type ServerPuzzleSet = {
   type: 'ServerPuzzleSet';
+  imageId: ImageId;
   originPanel: Panel;
   moveLogs: LogRow[];
 };
 
+type PuzzleSetConstructor =
+  | PanelConstructor
+  | CloneConstructor
+  | ServerPuzzleSetConstructor
+  | GenerateConstructor;
+type PanelConstructor = {
+  type: 'PanelConstructor';
+  panel: Panel;
+  imageId: ImageId;
+};
+type CloneConstructor = {type: 'CloneConstructor'; puzzleSet: PuzzleSet};
+type ServerPuzzleSetConstructor = {
+  type: 'ServerPuzzleSetConstructor';
+  puzzleSet: ServerPuzzleSet;
+  isPlayer: boolean;
+};
+type GenerateConstructor = {
+  type: 'GenerateConstructor';
+  size: number;
+  suffleTimes: number;
+  imageId: ImageId;
+};
 export class PuzzleSet {
   private panel: Panel;
   private originPanel: Panel;
+  private imageId: ImageId;
   private routes: number[] = []; // suffle時にemptyIndexを記録する(逆順に辿るとゴールできる)
   private moveLogs: LogRow[] = []; // moveTo時にemptyIndexを記録する
   public getPanel = () => this.panel;
@@ -21,6 +46,15 @@ export class PuzzleSet {
   public popRoutes = () => this.routes.pop();
   public getOriginPanel = () => this.originPanel;
   public getMoveLogs = () => this.moveLogs;
+  public getImageId = () => this.imageId;
+  public getServerPuzzleSet = (): Omit<ServerPuzzleSet, 'type'> => {
+    console.log('getServerPuzzleSet', this.getImageId());
+    return {
+      originPanel: this.getOriginPanel(),
+      moveLogs: this.getMoveLogs(),
+      imageId: this.getImageId(),
+    };
+  };
 
   private currentLogIndex = 0;
   public popMoveLog = () => {
@@ -37,43 +71,52 @@ export class PuzzleSet {
   };
   public getCurrentLogIndex = () => this.currentLogIndex;
 
-  constructor(panel: Panel);
-
-  constructor(puzzleSet: PuzzleSet);
-  constructor(puzzleSet: ServerPuzzleSet, isPlayer: boolean);
-
-  constructor(size: number, suffleTimes: number);
-
-  constructor(
-    p: PuzzleSet | ServerPuzzleSet | number | Panel,
-    s?: number | boolean,
-  ) {
-    if (p instanceof PuzzleSet) {
-      this.panel = Array.from(p.panel) as Panel;
-      this.routes = Array.from(p.routes);
-      this.originPanel = p.originPanel;
-      this.moveLogs = p.moveLogs;
-      this.currentLogIndex = p.currentLogIndex;
-    } else if (p instanceof Object && p.type === 'ServerPuzzleSet') {
-      const isPlayer = s;
-      this.panel = Array.from(p.originPanel) as Panel;
-      this.originPanel = Array.from(this.panel) as Panel;
-      if (!isPlayer) this.moveLogs = p.moveLogs;
-    } else if (p instanceof Array) {
-      this.panel = Array.from(p) as Panel;
-      this.originPanel = Array.from(this.panel) as Panel;
-      this.moveLogs = [];
-    } else if (typeof p === 'number' && typeof s === 'number') {
-      const suffleTimes = s;
-      this.panel = new Array(p * p).fill(0).map((_v, i) => i + 1) as Panel;
-      if (suffleTimes) {
-        this.suffle(suffleTimes);
+  constructor(param: PuzzleSetConstructor) {
+    switch (param.type) {
+      case 'CloneConstructor': {
+        const p = param.puzzleSet;
+        this.panel = Array.from(p.panel) as Panel;
+        this.routes = Array.from(p.routes);
+        this.originPanel = p.originPanel;
+        this.imageId = p.imageId;
+        this.moveLogs = p.moveLogs;
+        this.currentLogIndex = p.currentLogIndex;
+        break;
       }
-      this.originPanel = Array.from(this.panel) as Panel;
-      this.moveLogs = [];
-    } else {
-      console.log('error', 'nonConstructor', {p, s});
-      throw 'non constructor';
+      case 'ServerPuzzleSetConstructor': {
+        const isPlayer = param.isPlayer;
+        const p = param.puzzleSet;
+        this.panel = Array.from(p.originPanel) as Panel;
+        this.originPanel = Array.from(this.panel) as Panel;
+        this.imageId = p.imageId;
+        if (!isPlayer) this.moveLogs = p.moveLogs;
+        break;
+      }
+      case 'PanelConstructor': {
+        const p = param.panel;
+        this.panel = Array.from(p) as Panel;
+        this.originPanel = Array.from(this.panel) as Panel;
+        this.moveLogs = [];
+        this.imageId = param.imageId;
+        break;
+      }
+      case 'GenerateConstructor': {
+        const {suffleTimes, size, imageId} = param;
+        this.panel = new Array(size * size)
+          .fill(0)
+          .map((_v, i) => i + 1) as Panel;
+        if (suffleTimes) {
+          this.suffle(suffleTimes);
+        }
+        this.originPanel = Array.from(this.panel) as Panel;
+        this.moveLogs = [];
+        this.imageId = imageId;
+        break;
+      }
+      default: {
+        console.log('error', 'nonConstructor', param);
+        throw 'non constructor';
+      }
     }
   }
 
@@ -154,7 +197,7 @@ export class PuzzleSet {
   }
 
   clone(): PuzzleSet {
-    return new PuzzleSet(this);
+    return new PuzzleSet({type: 'CloneConstructor', puzzleSet: this});
   }
   isWin(): boolean {
     if (!this.panel) return false;

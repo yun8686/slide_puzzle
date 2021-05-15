@@ -12,7 +12,7 @@ import {colors} from '../pallete';
 import {User, getMe} from '../models/user';
 import {useNavigation} from '@react-navigation/native';
 import {RoomId, MatchingData} from '../models/room';
-import {getFindOtherUser, ImageUrl} from '../util/api';
+import {getFindOtherUser, ImageUrl, getImageUrl} from '../util/api';
 import {Flag} from 'react-native-svg-flagkit';
 import {getCropImage} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
@@ -26,35 +26,41 @@ type Props = {
 };
 
 const Matching = ({route}: Props) => {
-  const imageUri = route.params?.imageUri ?? ImageUrl;
+  const imageId = route.params?.imageId;
   const [matchingData, setMatchingData] = useState<MatchingData | undefined>(
     undefined,
   );
 
   const [waitTime, setWaitTime] = useState<number>(10);
+  const [isMounted, setIsMounted] = useState<boolean>(true);
   const navigation = useNavigation();
   useEffect(() => {
     (async () => {
-      const matchingData = await getFindOtherUser();
+      const matchingData = await getFindOtherUser({isCpu: false, imageId});
+      const imageUrl = getImageUrl(matchingData.puzzleSet.imageId);
       await Promise.all(
         new Array(16).fill('').map((_key, i) => {
-          return getCropImage(imageUri, i + 1);
+          return getCropImage(imageUrl, i + 1);
         }),
       );
-      setWaitTime(4);
-      setMatchingData({
-        user: matchingData.user,
-        puzzleSet: matchingData.puzzleSet,
-      });
+      if (isMounted) {
+        setWaitTime(4);
+        setMatchingData({
+          user: matchingData.user,
+          puzzleSet: matchingData.puzzleSet,
+        });
+      }
     })();
+    return () => {
+      setIsMounted(false);
+    };
   }, [getMe()]);
 
   useEffect(() => {
-    if (waitTime === 0 && matchingData) {
+    if (waitTime === 0 && matchingData && isMounted) {
       navigation.replace('Game', {
         matchingData,
         mode: 'PLAYER',
-        imageUri: imageUri,
       });
     } else {
       const timeout = setTimeout(() => {

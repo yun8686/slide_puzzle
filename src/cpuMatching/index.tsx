@@ -12,7 +12,7 @@ import {colors} from '../pallete';
 import {User, getMe} from '../models/user';
 import {useNavigation} from '@react-navigation/native';
 import {RoomId, MatchingData} from '../models/room';
-import {getFindOtherUser, ImageUrl} from '../util/api';
+import {getFindOtherUser, getImageUrl} from '../util/api';
 import {Flag} from 'react-native-svg-flagkit';
 import {getCropImage} from '../game/imageGenerator';
 import {PuzzleSet} from '../game/PuzzleSet';
@@ -24,7 +24,8 @@ type Props = {
   route: {params: RootStackParamList['CpuMatching']};
 };
 const CpuMatching = ({route}: Props) => {
-  const imageUri = route.params?.imageUri ?? ImageUrl;
+  const imageId = route.params?.imageId;
+  const imageUrl = getImageUrl(imageId);
 
   const [matchingData, setMatchingData] = useState<MatchingData | undefined>(
     undefined,
@@ -32,21 +33,29 @@ const CpuMatching = ({route}: Props) => {
 
   const [waitTime, setWaitTime] = useState<number>(10);
   const navigation = useNavigation();
+  const [isMounted, setIsMounted] = useState<boolean>(true);
   useEffect(() => {
     (async () => {
-      const matchingData = await getFindOtherUser(true);
+      const matchingData = await getFindOtherUser({
+        isCpu: true,
+        imageId,
+      });
       await Promise.all(
         new Array(16).fill('').map((_key, i) => {
-          return getCropImage(imageUri, i + 1);
+          return getCropImage(imageUrl, i + 1);
         }),
       );
-      setWaitTime(4);
-      setMatchingData({
-        user: matchingData.user,
-        puzzleSet: matchingData.puzzleSet,
-      });
+      if (isMounted) {
+        setWaitTime(4);
+        setMatchingData({
+          user: matchingData.user,
+          puzzleSet: matchingData.puzzleSet,
+        });
+      }
     })();
-    return () => {};
+    return () => {
+      setIsMounted(false);
+    };
   }, [getMe()]);
 
   useEffect(() => {
@@ -54,7 +63,7 @@ const CpuMatching = ({route}: Props) => {
       navigation.replace('Game', {
         matchingData,
         mode: 'CPU',
-        imageUri: imageUri,
+        imageId: imageId,
       });
       return () => {};
     } else {

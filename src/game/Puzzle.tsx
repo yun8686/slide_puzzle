@@ -55,9 +55,9 @@ type Puzzle = {
   panel: Panel;
   onTouchIndex?: (index: number) => void;
   panelSize: number;
-  imageUri: string;
+  imageUrl: string;
 };
-const Puzzle = ({width, panel, panelSize, onTouchIndex, imageUri}: Puzzle) => {
+const Puzzle = ({width, panel, panelSize, onTouchIndex, imageUrl}: Puzzle) => {
   return (
     <View
       style={{
@@ -71,7 +71,7 @@ const Puzzle = ({width, panel, panelSize, onTouchIndex, imageUri}: Puzzle) => {
         return (
           <Cell
             key={v}
-            imageUri={imageUri}
+            imageUri={imageUrl}
             width={width / panelSize}
             onTouchEnd={() => {
               onTouchIndex && onTouchIndex(i);

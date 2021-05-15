@@ -17,7 +17,7 @@ import {RootStackParamList} from '../../App';
 import {PuzzleSet} from './PuzzleSet';
 import {useNavigation} from '@react-navigation/native';
 import {Flag} from 'react-native-svg-flagkit';
-import {sendPuzzleSet} from '../util/api';
+import {sendPuzzleSet, getImageUrl} from '../util/api';
 
 const {width, height} = Dimensions.get('screen');
 const WINDOW_WIDTH = width;
@@ -34,8 +34,9 @@ const Game = ({route}: Props) => {
   const {
     mode: gameMode,
     matchingData: {user: otherUser, puzzleSet: basePuzzleSet},
-    imageUri,
   } = route.params;
+  const imageUrl = getImageUrl(basePuzzleSet.imageId);
+  console.log('imageUrl', imageUrl);
   const [panel, setPanel] = useState<PuzzleSet>();
   const [otherPanel, setOtherPanel] = useState<PuzzleSet>();
   const [waitTime, setWaitTime] = useState(5);
@@ -44,13 +45,27 @@ const Game = ({route}: Props) => {
 
   useEffect(() => {
     if (basePuzzleSet) {
-      setPanel(() => new PuzzleSet(basePuzzleSet, true));
+      setPanel(
+        () =>
+          new PuzzleSet({
+            type: 'ServerPuzzleSetConstructor',
+            puzzleSet: basePuzzleSet,
+            isPlayer: true,
+          }),
+      );
     }
     return () => {};
   }, [basePuzzleSet]);
   useEffect(() => {
     if (basePuzzleSet) {
-      setOtherPanel(() => new PuzzleSet(basePuzzleSet, false));
+      setOtherPanel(
+        () =>
+          new PuzzleSet({
+            type: 'ServerPuzzleSetConstructor',
+            puzzleSet: basePuzzleSet,
+            isPlayer: false,
+          }),
+      );
     }
     return () => {};
   }, [basePuzzleSet]);
@@ -85,6 +100,7 @@ const Game = ({route}: Props) => {
 
   useEffect(() => {
     if (isWon && panel) {
+      console.log('sendPuzzleSet', gameMode, panel);
       sendPuzzleSet(gameMode, panel);
     }
     return () => {};
@@ -94,7 +110,7 @@ const Game = ({route}: Props) => {
   return (
     <SafeAreaView>
       {waitTime >= 0 ? <WaitingModal waitTime={waitTime} /> : null}
-      {isModelModal ? <ModelModal imageUri={imageUri} /> : null}
+      {isModelModal ? <ModelModal imageUrl={imageUrl} /> : null}
       {isWon || isLose ? (
         <ResultModal
           isWin={isWon}
@@ -120,14 +136,14 @@ const Game = ({route}: Props) => {
             <UserInfo user={otherUser} />
           </View>
           <Puzzle
-            imageUri={imageUri}
+            imageUrl={imageUrl}
             width={~~(PUZZLE_WIDTH / 12) * 4}
             panel={otherPanel.getPanel()}
             panelSize={PANE_SIZE}
           />
         </View>
         <Puzzle
-          imageUri={imageUri}
+          imageUrl={imageUrl}
           width={PUZZLE_WIDTH}
           panel={panel.getPanel()}
           onTouchIndex={(nextIndex) => {
@@ -246,7 +262,7 @@ const CenterModal = ({
   );
 };
 
-const ModelModal = ({imageUri}: {imageUri: string}) => {
+const ModelModal = ({imageUrl}: {imageUrl: string}) => {
   return (
     <Modal isVisible={true}>
       <View
@@ -259,7 +275,7 @@ const ModelModal = ({imageUri}: {imageUri: string}) => {
           alignItems: 'center',
         }}>
         <Image
-          source={{uri: imageUri}}
+          source={{uri: imageUrl}}
           style={{
             width: WINDOW_WIDTH,
             height: WINDOW_WIDTH,

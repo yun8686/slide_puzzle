@@ -29,9 +29,12 @@ const Gallary = ({route}: Props) => {
   const navigation = useNavigation();
   const [gallary, setGallary] = useState<LocalImageInfo[]>();
   const [isNavigate, setIsNavigate] = useState<boolean>();
+  const [isMounted, setIsMounted] = useState<boolean>(true);
   useEffect(() => {
     (async () => {
+      console.log('start get gallary');
       const gallary = await getGallary();
+      console.log('start get gallary fetch end');
       const localGallary: LocalImageInfo[] = [];
       for (const g of gallary) {
         localGallary.push({
@@ -39,9 +42,13 @@ const Gallary = ({route}: Props) => {
           localUri: await getFullPuzzleImage(getImageUrl(g)),
         });
       }
-      setGallary(localGallary);
-    })();
-    return () => {};
+      if (isMounted) setGallary(localGallary);
+    })().catch((e) => {
+      console.log('gallary error', e);
+    });
+    return () => {
+      setIsMounted(false);
+    };
   }, []);
   return (
     <SafeAreaView>
@@ -57,7 +64,7 @@ const Gallary = ({route}: Props) => {
                   if (!isNavigate) {
                     setIsNavigate(true);
                     navigation.replace('Matching', {
-                      imageUri: v.localUri,
+                      imageId: v._id,
                     });
                   }
                 }}>

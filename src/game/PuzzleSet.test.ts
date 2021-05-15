@@ -1,24 +1,33 @@
 import jest from 'jest';
 import {PuzzleSet, ServerPuzzleSet} from './PuzzleSet';
-import {Panel} from '.';
+
+const createPuzzleSet = (size: number, suffleTimes: number) => {
+  return new PuzzleSet({
+    type: 'GenerateConstructor',
+    size: size,
+    suffleTimes: suffleTimes,
+    imageId: 'null' as any,
+  });
+};
+
 describe('PuzzleSet', () => {
   it('should be suffle', () => {
-    const puzzleSet = new PuzzleSet(4, 100);
+    const puzzleSet = createPuzzleSet(4, 100);
     puzzleSet.suffle(1000);
-    expect(puzzleSet.getPanel()).not.toEqual(new PuzzleSet(4, 0).getPanel());
+    expect(puzzleSet.getPanel()).not.toEqual(createPuzzleSet(4, 0).getPanel());
   });
   it('should be routes reverse', () => {
     for (let i = 0; i < 100; i++) {
-      let puzzleSet = new PuzzleSet(4, 100);
+      let puzzleSet = createPuzzleSet(4, 100);
       const routes = puzzleSet.getRoutes();
       routes.reverse().forEach((route) => {
         puzzleSet.moveTo(route, true);
         puzzleSet = puzzleSet.clone();
       });
       expect(puzzleSet.getMoveLogs().map((v) => v.emptyIndex)).toEqual(routes);
-      expect(puzzleSet.getPanel()).toEqual(new PuzzleSet(4, 0).getPanel());
+      expect(puzzleSet.getPanel()).toEqual(createPuzzleSet(4, 0).getPanel());
 
-      let puzzleSet2 = new PuzzleSet(puzzleSet.getOriginPanel());
+      let puzzleSet2 = puzzleSet.clone();
       puzzleSet
         .getMoveLogs()
         .map((v) => v.emptyIndex)
@@ -30,13 +39,17 @@ describe('PuzzleSet', () => {
   });
   it('should be reverse original panel', () => {
     for (let i = 0; i < 100; i++) {
-      let puzzleSet = new PuzzleSet(4, 100);
+      let puzzleSet = createPuzzleSet(4, 100);
       const routes = puzzleSet.getRoutes();
       routes.reverse().forEach((route) => {
         puzzleSet.moveTo(route, true);
         puzzleSet = puzzleSet.clone();
       });
-      let puzzleSet2 = new PuzzleSet(puzzleSet.getOriginPanel());
+      let puzzleSet2 = new PuzzleSet({
+        type: 'PanelConstructor',
+        panel: puzzleSet.getOriginPanel(),
+        imageId: 'null' as any,
+      });
       puzzleSet
         .getMoveLogs()
         .map((v) => v.emptyIndex)
@@ -44,7 +57,7 @@ describe('PuzzleSet', () => {
           puzzleSet2.moveTo(index, false);
           puzzleSet2 = puzzleSet2.clone();
         });
-      expect(puzzleSet2.getPanel()).toEqual(new PuzzleSet(4, 0).getPanel());
+      expect(puzzleSet2.getPanel()).toEqual(createPuzzleSet(4, 0).getPanel());
     }
   });
   it('calc puzzle', () => {
@@ -86,16 +99,21 @@ describe('PuzzleSet', () => {
     ];
     list.forEach(({puzzleSet: {originPanel, moveLogs}}) => {
       let puzzleSet2 = new PuzzleSet({
-        originPanel,
-        moveLogs,
-      } as ServerPuzzleSet);
+        type: 'ServerPuzzleSetConstructor',
+        puzzleSet: {
+          type: 'ServerPuzzleSet',
+          originPanel,
+          moveLogs,
+        } as ServerPuzzleSet,
+        isPlayer: true,
+      });
       moveLogs
         .map((v) => v.emptyIndex)
         .forEach((index) => {
           puzzleSet2.moveTo(index, false);
           puzzleSet2 = puzzleSet2.clone();
         });
-      expect(puzzleSet2.getPanel()).toEqual(new PuzzleSet(4, 0).getPanel());
+      expect(puzzleSet2.getPanel()).toEqual(createPuzzleSet(4, 0).getPanel());
     });
   });
 });

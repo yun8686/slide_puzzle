@@ -19,8 +19,10 @@ const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 8080;
 
 app.get('/', (_req, res) => {
+  console.log('access to root path', _req.headers['x-forwarded-for']);
   res.sendFile(__dirname + '/index.html');
 });
+app.use(express.static('public'));
 app.use(user);
 app.use(game);
 app.use(ranking);
